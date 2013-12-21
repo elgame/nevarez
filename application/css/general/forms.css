@@ -1,0 +1,116 @@
+/*Login*/
+.frmlogin{
+	position: absolute;
+	top:30%;
+	left: 38%;
+	width: 300px;
+	background-color: #F1F1F1;
+	border:1px #ccc solid;
+	padding: 10px;
+}
+.frmlogin .title{
+	text-align: center;
+	font-weight: bold;
+	color:#333;
+}
+.frmlogin label{
+	color: #333;
+	font-size:.9em;
+	font-weight: bold;
+}
+.frmlogin input[type=text], .frmlogin input[type=password]{
+	color: #333;
+	font-size:1.2em;
+	border:1px #bbb solid;
+}
+
+
+/**Formularios add mod**/
+.frm_addmod{}
+.frm_addmod input[type=text]{
+	font-size:1.1em;
+	color:#333;
+	border:1px #bbb solid;
+}
+.frm_addmod select{
+	color: #333;
+	font-size: 1em;
+	border:1px #bbb solid;
+}
+.frm_addmod label{
+	font-size: .9em;
+	font-weight: bold;
+	color:#666;
+}
+.frm_addmod textarea{
+	font-size:1.1em;
+	color:#333;
+	border:1px #bbb solid;
+	resize: none;
+}
+.frm_addmod fieldset{
+	margin: 0;
+	padding: 0;
+	border:1px #aaa solid;
+}
+.frm_addmod legend{
+	font-size: .8em;
+	font-weight: bold;
+	color:#444;
+}
+.frm_addmod .ej-info{
+	font-size: .7em;
+	color:#bbb;
+}
+.frmsec-left{ margin-bottom: 20px;}
+.frmsec-right{
+	text-align: center;
+}
+.frmsec-right .frmbox-r{
+	background-color: #F1F1F1;
+	border:1px #ccc solid;
+	border-left:none;
+	margin-bottom: 10px;
+}
+.frmsec-right .frmbox-r.priv label{
+	font-weight: normal;
+}
+.frmsec-right .priv{
+	height: 200px;
+	overflow-y: auto;
+	text-align: left;
+}
+/*acordion en form*/
+#frmsec-acordion{
+	font-size: 1em;
+}
+#frmsec-acordion h3 a{
+	color: #333;
+	padding-left: 20px;
+}
+
+
+/*Filtros*/
+form.frmfiltros{
+	display: block;
+	width: 98%;
+	margin: 5px auto;
+	cursor: default;
+	text-align: center;
+	padding: 2px 0;
+	border:1px #ccc solid;
+}
+form.frmfiltros label{
+	color: #333;
+	font-size: .8em;
+}
+form.frmfiltros input[type=text]{
+	color: #333;
+	font-size: 1em;
+	border:1px #ccc solid;
+}
+form.frmfiltros select{
+	color: #333;
+	font-size: 1em;
+	border:1px #ccc solid;
+}

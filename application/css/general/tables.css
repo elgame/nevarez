@@ -1,0 +1,58 @@
+.tblListados{
+	width:98%;
+	margin:14px auto;
+	border:1px #ccc solid;
+	border-spacing: 0;
+	padding: 0;
+	font-size: .8em;
+}
+.tblListados.m0-tb{
+	margin:0px auto;
+}
+.tblListados tr.header, .tblListados tr.foot{
+	color:#333;
+	font-weight: bold;
+	cursor: default;
+}
+.tblListados tr.header td{
+	padding: 6px 2px 6px 4px;
+}
+.tblListados td{
+	padding: 4px 2px 4px 4px;
+}
+.tblListados tr:nth-child(2n+1) {
+	background-color: #eee;
+}
+.tblListados tr:hover{
+	background-color: #DEEDD3 !important;
+}
+
+/*Sub menu*/
+.tblListados td.tdsmenu{
+	cursor:pointer;
+}
+.tblListados td .submenul{
+	position: relative;
+	top: -2px;
+	background-color: #DEEDD3;
+	display: none;
+}
+.tblListados td .submenul p{
+	position: absolute;
+	top: -8px;
+	display: block;
+	width: 100%;
+	border:1px #ccc solid;
+	border-top:none;
+	background-color: #DEEDD3;
+	text-align: center;
+}
+.tblListados td .submenul p a{
+	color:#1E70F9;
+	text-decoration: none;
+}
+.tblListados td .submenul p a:hover{
+	text-decoration: underline;
+}
+
+

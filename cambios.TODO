@@ -1,0 +1,5 @@
+
+Remplazar los archivos modificados, los que estan abiertos
+Ejecutar http://localhost/nevarez/panel/facturacion/parchefac para las facturas 1 y 2
+Cambiar en facturacion/parchefac a regeneraFacturas2() y en facturacion_model identificar el rango de folios y los dias en facturacion
+Ejecutar de new http://localhost/nevarez/panel/facturacion/parchefac para las facturas 3
