@@ -420,8 +420,10 @@ class nomina_model extends privilegios_model{
 			if (!isset($_GET['fsemana'])) $_GET['fsemana'] = String::obtenerSemanaActual(date('Y-m-d'));
 		}
 
+		
 		$_GET['fanio'] = ($_GET['fanio'] != '') ? $_GET['fanio'] : date('Y');
-		$sql->num_rows = 0;
+		$_GET['fsemana'] = ($_GET['fsemana'] != '') ? $_GET['fsemana'] : String::obtenerSemanaActual(date('Y-m-d'));
+		$num_rows = 0;
 		if ( $verificar_nomina ) {
 			$historial = TRUE;
 			$sql = $this->db->query("SELECT en.id_empleado, en.anio, en.semana, en.fecha_inicio, en.fecha_fin, en.fecha, en.dias_trabajados, en.salario_diario, en.sueldo_semanal, 
@@ -429,11 +431,12 @@ class nomina_model extends privilegios_model{
 																			e.curp, e.fecha_entrada, e.fecha_salida, e.hora_entrada, e.salario
 															FROM empleados_nomina as en
 															INNER JOIN empleados as e ON e.id_empleado=en.id_empleado
-															WHERE en.anio = {$_GET['fanio']} AND en.semana = {$_GET['fsemana']}
-															ORDER BY (e.apellido_paterno, e.apellido_materno, e.nombre) ASC");
+															WHERE en.anio = {$_GET['fanio']} AND en.semana = {$_GET['fsemana']} 
+															ORDER BY e.apellido_paterno, e.apellido_materno, e.nombre ASC");
+			$num_rows = $sql->num_rows();
 		}
 		
-		if ($sql->num_rows == 0) {
+		if ($num_rows == 0) {
 			$historial = FALSE;
 
 			$semanas = String::obtenerSemanasDelAnio($_GET['fanio'],true);

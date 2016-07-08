@@ -993,7 +993,7 @@ class Carabiner {
 				
 				$dir = ( $this->isURL($ref) ) ? '' : ( ($cache) ? $this->cache_uri : $this->style_uri );
 				
-				return '<link type="text/css" rel="stylesheet" href="'.$dir.$ref.'" media="'.$media.'" />'."\r\n";
+				return '<link type="text/css" rel="stylesheet" href="'.$dir.$ref.'?v=1.0" media="'.$media.'" />'."\r\n";
 			
 			break;
 
@@ -1001,7 +1001,7 @@ class Carabiner {
 				
 				$dir = ( $this->isURL($ref) ) ? '' : ( ($cache) ? $this->cache_uri : $this->script_uri );
 				
-				return '<script type="text/javascript" src="'.$dir.$ref.'" charset="'.$this->CI->config->item('charset').'"></script>'."\r\n";
+				return '<script type="text/javascript" src="'.$dir.$ref.'?v=1.0" charset="'.$this->CI->config->item('charset').'"></script>'."\r\n";
 			
 			break;
 		

@@ -485,20 +485,34 @@ class String{
 			$anio = date('Y');
 			
 		$data = array();
-		if($dias_defasados==false){
-			$dia = 1;
-			while(count($data)==0){
-				$diaSemana = -1;
-				$diaSemana = self::obtenerDiaSemana($anio."-01-0".$dia);
-				if(($dias_defasados==false && $diaSemana==0) || ($dias_defasados==true && $diaSemana==5)){//0=lunes   6=domingo
-					$data['fecha_inicio'] = $anio."-01-0".$dia;
-					$data['fecha_final'] = self::suma_fechas($data['fecha_inicio'],6);
-					$data['semana'] = 1;
-					$data['anio'] = $anio;
-				}
-				++$dia;
-			}
-		}
+		# Obtenemos la semana del primer dia del mes
+		$primeraSemana=intval(date("W",mktime(0,0,0,1,1,$anio)));
+    	$primerDiaDelAnio = mktime(0, 0, 0, 1, 1, $anio);
+	    $primerJuevesDelAnio = strtotime('monday', $primerDiaDelAnio);
+	    $primerDiaPrimeraSemanaDelAnio = strtotime(date("Y-m-d", $primerJuevesDelAnio) . " - 0 days");
+
+    	$data['fecha_inicio'] = date("Y-m-d", $primerDiaPrimeraSemanaDelAnio);
+	    if($primeraSemana == 1 && $data['fecha_inicio'] > date("Y-m-d", $primerDiaDelAnio))
+	    	$data['fecha_inicio'] = date("Y-m-d", strtotime('last monday', $primerDiaPrimeraSemanaDelAnio));
+
+		$data['fecha_final'] = self::suma_fechas($data['fecha_inicio'],6);
+		$data['semana'] = 1;
+		$data['anio'] = $anio;
+
+		// if($dias_defasados==false){
+		// 	$dia = 1;
+		// 	while(count($data)==0){
+		// 		$diaSemana = -1;
+		// 		$diaSemana = self::obtenerDiaSemana($anio."-01-0".$dia);
+		// 		if(($dias_defasados==false && $diaSemana==0) || ($dias_defasados==true && $diaSemana==5)){//0=lunes   6=domingo
+		// 			$data['fecha_inicio'] = $anio."-01-0".$dia;
+		// 			$data['fecha_final'] = self::suma_fechas($data['fecha_inicio'],6);
+		// 			$data['semana'] = 1;
+		// 			$data['anio'] = $anio;
+		// 		}
+		// 		++$dia;
+		// 	}
+		// }
 	
 		return $data;
 	}

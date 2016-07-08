@@ -3,6 +3,64 @@
 class UploadFiles{
 	
 	/**
+	 * Guarda el logo de un productor
+	 */
+	public static function uploadEmpresaLogo(){
+		$ci =& get_instance();
+		if(isset($_FILES['dlogo'])){
+			if($_FILES['dlogo']['name']!=''){
+				$config['upload_path'] = APPPATH.'images/empresas/';
+				$config['allowed_types'] = 'jpg|jpeg|gif|png';
+				$config['max_size']	= '1500';
+				$config['max_width'] = '1925';
+				$config['max_height'] = '1085';
+				$config['encrypt_name'] = true;
+				$ci->load->library('upload', $config);
+				if(!$ci->upload->do_upload('dlogo')){
+					$data = array(false, $ci->upload->display_errors());
+				}else{
+					$data = array(true, $ci->upload->data());
+					$config = array();
+					$config['image_library'] = 'gd2';
+					$config['source_image']	= $data[1]['full_path'];
+					$config['create_thumb'] = false;
+					$config['master_dim'] = 'auto';
+					$config['width']	 = 400;
+					$config['height']	= 400;
+
+					$ci->load->library('image_lib', $config);
+					$ci->image_lib->resize();
+				}
+				return $data;
+			}
+			return false;
+		}
+
+		return 'ok';
+	}
+	
+	/**
+	 * Sube un archivo tal cual
+	 */
+	public static function uploadFile($file, $path='openssl/bin/'){
+		$ci =& get_instance();
+		if(isset($_FILES[$file])){
+			if($_FILES[$file]['name']!=''){
+				$config['upload_path'] = $path;
+
+				if ($_FILES[$file]["error"] == UPLOAD_ERR_OK) {
+					$tmp_name = $_FILES[$file]["tmp_name"];
+	        move_uploaded_file($tmp_name, $config['upload_path'].$_FILES[$file]["name"]);
+	        return $_FILES[$file]["name"];
+      	}
+			}
+			return false;
+		}
+
+		return 'ok';
+	}
+	
+	/**
 	 * Guarda la imagen de un empleado
 	 */
 	public static function uploadImgEmpleado(){

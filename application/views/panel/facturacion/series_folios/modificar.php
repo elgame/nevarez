@@ -1,6 +1,23 @@
 <div id="contentAll" class="f-l">
 	<form action="<?php echo base_url('panel/facturacion/modificar_serie_folio/?'.String::getVarsLink(array('msg')));?>" method="post" class="frm_addmod" enctype="multipart/form-data">
 		<div class="frmsec-left w60 f-l">
+        	<p class="f-l w50">
+				<label for="fidempresa">*Empresa a la que pertenece</label><br>
+				<select name="fidempresa" id="fidempresa">
+                	<option value=""></option>
+                	<?php
+						foreach($empresas as $row){
+							if(isset($serie_info[0]->id_empresa)){
+								$selected = (intval($serie_info[0]->id_empresa)==intval($row->id_empresa))? 'selected="selected"' : '';
+							}else
+								$selected = '';
+							echo '<option value="'.$row->id_empresa.'" '.$selected.'>'.$row->nombre_fiscal.'</option>';
+						}
+					?>
+                </select>
+			</p>
+            <p class="clear"></p>
+            
 			<p class="f-l w50">
 				<label for="fserie">Serie</label><br>
 				<input type="text" name="fserie" id="fserie" value="<?php echo (isset($serie_info[0]->serie)) ? $serie_info[0]->serie : set_value('fserie') ?>" size="30" autofocus maxlength="30">

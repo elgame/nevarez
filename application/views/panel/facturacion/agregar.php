@@ -125,6 +125,17 @@
 			
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
+                	<div class="w100 f-l">
+						<label for="didempresa">Empresa</label> <br>
+						<select name="didempresa" id="didempresa" onchange="get_seriesfrom_empresa(this.value);" style="width: 100%;">
+							<option value="">---------------------------</option>
+							<?php
+								foreach($empresas as $row){
+									echo '<option value="'.$row->id_empresa.'">'.$row->nombre_fiscal.'</option>';
+								}
+							?>
+						</select>
+					</div>
 					<div class="w100 f-l">
 						<label for="dleyendaserie">Leyenda-Serie</label> <br>
 						<select name="dleyendaserie" id="dleyendaserie">
@@ -164,7 +175,7 @@
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w100">
 						<label for="dno_certificado">*No Certificado</label> <br>
-						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado',$no_certificado) ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
+						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado') ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
 					</div>
 				</div>
 			</div>
@@ -215,6 +226,7 @@
 					<div class="clear"></div>
 				</div>
 				<input type="button" name="enviar" value="Guardar" class="btn-blue corner-all" id="submit">
+				<img src="<?php echo base_url('application/images/loader.gif'); ?>" id="submitLoader" style="display:none;">
 			</div>
 			
 			

@@ -1,5 +1,6 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
+	RewriteBase /nevarez
 	#utf-8 o iso-8859-1
 	AddDefaultCharset utf-8
 

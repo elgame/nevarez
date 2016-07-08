@@ -116,9 +116,15 @@
 					<div class="clear"></div>
 				</div>
 			</div>
+            
 			
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
+                	<div class="w100 f-l">
+                        <label for="didempresa">Empresa</label> <br>
+                        <input type="text" name="didempresa" id="didempresa" value="<?php echo $factura['nombre_fiscal']?>" size="6" readonly style="width:95%; font-size:14px;"  />
+                    </div>
+                    
 					<div class="w100 f-l">
 						<label for="dleyendaserie">Leyenda-Serie</label> <br>
 						<select name="dleyendaserie" id="dleyendaserie" disabled>

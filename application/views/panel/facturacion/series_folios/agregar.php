@@ -1,6 +1,19 @@
 <div id="contentAll" class="f-l">
 	<form action="<?php echo base_url('panel/facturacion/agregar_serie_folio');?>" method="post" class="frm_addmod" enctype="multipart/form-data">
 		<div class="frmsec-left w60 f-l">
+        	<p class="f-l w50">
+				<label for="fidempresa">*Empresa a la que pertenece</label><br>
+				<select name="fidempresa" id="fidempresa">
+                	<option value=""></option>
+                	<?php
+						foreach($empresas as $row){
+							echo '<option value="'.$row->id_empresa.'">'.$row->nombre_fiscal.'</option>';
+						}
+					?>
+                </select>
+			</p>
+            <p class="clear"></p>
+            
 			<p class="f-l w50">
 				<label for="fserie">Serie</label><br>
 				<input type="text" name="fserie" id="fserie" value="<?php echo set_value('fserie') ?>" size="30" autofocus maxlength="30">
