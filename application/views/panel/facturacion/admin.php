@@ -48,6 +48,9 @@
 							echo $this->empleados_model->getLinkPrivSm('facturacion/pagar/', $f->id_factura,'','rel="superbox[iframe][500x330]" data-sbox="notas_venta"','');
 						echo $this->empleados_model->getLinkPrivSm('facturacion/xml/', $f->id_factura);
 						echo $this->empleados_model->getLinkPrivSm('facturacion/imprimir_pdf/', $f->id_factura,'','target="_BLANK"');
+						
+						echo $this->empleados_model->getLinkPrivSm('facturacion/enviar_documentos/', $f->id_factura,'','rel="superbox[iframe][500x330]" data-sbox="notas_venta"','');
+						
 						if($f->status!='ca')
 							echo $this->empleados_model->getLinkPrivSm('facturacion/cancelar/', $f->id_factura, 
 									"msb.confirm('Estas seguro de cancelar fáctura?', this); return false;", '', '&'.String::getVarsLink());

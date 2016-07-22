@@ -89,6 +89,15 @@ $(function(){
     $('#submit').on('click',function(){ajax_submit_form();});
 });
 
+function get_seriesfrom_empresa(id_empresa){
+	loader.create();
+    $.post(base_url+'panel/facturacion/ajax_get_seriesfromempresa/', {id_empresa:id_empresa}, function(resp){
+        $('#dleyendaserie').html(resp.series);
+		$('#dno_certificado').val(resp.numcertificado);
+    }, "json").complete(function(){
+    	loader.close();
+	});
+}
 
 function set_data_cliente(item, autocom){
     $("#hcliente").val(item.id);
@@ -226,7 +235,10 @@ function ajax_get_total_tickets(data){
 
 function ajax_submit_form(){
 //      win = window.open(base_url+'panel/facturacion/imprimir_pdf/?&id=l4fc8265798f681.79280660', 'Imprimir Factura', 'left='+((window.innerWidth/2)-240)+',top='+((window.innerHeight/2)-280)+',width=500,height=630,toolbar=0,resizable=0')
-     $.post(base_url+'panel/facturacion/ajax_valida_folio/', 
+    
+    $("#submit").hide();
+    $("#submitLoader").show();
+    $.post(base_url+'panel/facturacion/ajax_valida_folio/', 
                     {'serie': $('#dserie').val(), 'folio': $('#dfolio').val()}, 
                     function(r)
     {
@@ -246,6 +258,7 @@ function ajax_submit_form(){
             post.fcp = $('#fcp').val();
             post.fpais = $('#fpais').val();
             
+			post.didempresa = $('#didempresa').val();
             post.fplazo_credito = $('#fplazo_credito').val();
             post.dfecha = $('#dfecha').val();
             post.dcondicion_pago = $('#dcondicion_pago').val();
@@ -305,19 +318,30 @@ function ajax_submit_form(){
                     updateTablaPrecios();
                     
                     win = window.open(base_url+'panel/facturacion/imprimir_pdf/?&id='+resp.id_factura, 'Imprimir Factura', 'left='+((window.innerWidth/2)-240)+',top='+((window.innerHeight/2)-280)+',width=500,height=630,toolbar=0,resizable=0')
-                        
+                    window.location.reload();
                 }
+                $("#submit").show();
+                $("#submitLoader").hide();
 
             }, "json").complete(function(){ 
+                            $("#submit").show();
+                            $("#submitLoader").hide();
                             loader.close();
                         });
         }
-        else if(r == 2) 
-            alerta('El certificado para firmar las facturas ya caduco.')
-        else
-            alerta('La serie y folio ya estan en uso.')
+        else if(r == 2){ 
+            $("#submit").show();
+            $("#submitLoader").hide();
+            alerta('El certificado para firmar las facturas ya caduco.');
+        }else{
+            $("#submit").show();
+            $("#submitLoader").hide();
+            alerta('La serie y folio ya estan en uso.');
+        }
     }, "json").complete(function(){ 
-        loader.close();
+        // $("#submit").show();
+        // $("#submitLoader").hide();
+        // loader.close();
     });
 }
 

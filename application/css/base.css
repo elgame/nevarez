@@ -111,6 +111,7 @@ ul.treeview{
 	font-weight: bold;
 	background: #F9EDBE url(../../application/images/loader.gif) no-repeat 5px center;
 	border:1px #F0C36D solid;
+	z-index: 1000;
 }
 
 

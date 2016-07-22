@@ -132,14 +132,28 @@ class alertas_model extends privilegios_model{
 			$params['total'] = $query->num_rows();
 			
 			foreach ($params['data']['alertas'] as $key => $h) {
-				if ($h->dias_restantes<=0)
-					$params['data']['alertas'][$key]->style = 'style="background-color:#FFE1E1;"';
-				else
-					$params['data']['alertas'][$key]->style = '';
+				$exitt = $this->cobranzaInfo($h->tabla_obj, $h->id_obj1);
+				if( !isset($exitt->status) || $exitt->status == 'ca' || $exitt->status == 'pa') {
+					$this->db->delete("alertas", array("id_alerta" => $h->id_alerta));
+					unset($params['data']['alertas'][$key]);
+				}else{
+					if ($h->dias_restantes<=0)
+						$params['data']['alertas'][$key]->style = 'style="background-color:#FFE1E1;"';
+					else
+						$params['data']['alertas'][$key]->style = '';
+				}
 			}
 			$html_alert = $this->load->view("panel/alertas/alerta_cobranza.php",$params,TRUE);
 		}
 		return $html_alert;
+	}
+	
+	public function cobranzaInfo($tabla_obj, $id_obj1){
+		$query = $this->db->query("
+				SELECT *
+				FROM ".$tabla_obj."
+				WHERE ".($tabla_obj=='facturacion'? 'id_factura': 'id_ticket')." = '".$id_obj1."'")->row();
+		return $query;
 	}
 
 	public function cuentas_pagar($value='')

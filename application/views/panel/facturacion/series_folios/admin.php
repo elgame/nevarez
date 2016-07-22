@@ -13,6 +13,7 @@
 	
 <table class="tblListados corner-all8">
 		<tr class="header btn-gray">
+        	<td>Empresa</td>
 			<td>Serie</td>
 			<td>No Aprobación</td>
 			<td>Folio Inicio</td>
@@ -22,6 +23,7 @@
 
 		<?php foreach($datos_s['series'] as $serie){ ?>
 				<tr class="row-conte">
+                	<td><?php echo $serie->nombre_fiscal;?></td>
 					<td><?php echo $serie->serie;?></td>
 					<td><?php echo $serie->no_aprobacion; ?></td>
 					<td><?php echo $serie->folio_inicio; ?></td>
