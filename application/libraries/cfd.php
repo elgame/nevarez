@@ -54,7 +54,7 @@ class cfd{
 
 		if(count($data["productos"])>0)
 			foreach($data["productos"] as $key => $p){
-				$cadena .= $p['cantidad'].'|'.$p['unidad'].'|'.$p['descripcion'].'|'.$p['precio_unit'].'|'.$p['importe'].'|';
+				$cadena .= $p['cantidad'].'|'.$p['unidad'].'|'.$p['descripcion'].'|'.$p['valorUnitario'].'|'.$p['importe'].'|';
 		}
 
 		if(isset($data["total_isr"]))

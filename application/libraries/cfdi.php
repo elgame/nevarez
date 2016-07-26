@@ -526,7 +526,7 @@ class cfdi{
 	public function generaArchivos($data)
   {
 		$this->cargaDatosFiscales($data['id'], $data['table']);
-		
+
 		// $vers = str_replace('.', '_', $this->version);
 		$pathXML = $this->guardarXML($data);
 		// $this->generarUnPDF($data);
@@ -1441,5 +1441,5 @@ class cfdi{
 				}
 			}
 	}
-	
+
 }
