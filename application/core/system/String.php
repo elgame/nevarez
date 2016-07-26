@@ -1,7 +1,54 @@
 <?php
 
 class String{
-	
+
+	public static function getMetodoPago($codigo='', $nombre='')
+  {
+    $codigo = (string)$codigo;
+    $nombre = (string)$nombre;
+    $metodosPagos = [
+      '01' => 'Efectivo',
+      '02' => 'Cheque nominativo',
+      '03' => 'Transferencia electrónica de fondos',
+      '04' => 'Tarjetas de crédito',
+      '05' => 'Monederos electrónicos',
+      '06' => 'Dinero electrónico',
+      '08' => 'Vales de despensa',
+      '28' => 'Tarjeta de débito',
+      '29' => 'Tarjeta de servicio',
+      '99' => 'Otros',
+
+      // '01' => 'Efectivo',
+      // '02' => 'Cheque',
+      // '03' => 'Transferencia',
+      // '04' => 'Tarjetas de crédito',
+      // '05' => 'Monederos electrónicos',
+      // '06' => 'Dinero electrónico',
+      // '07' => 'Tarjetas digitales',
+      // '08' => 'Vales de despensa',
+      // '09' => 'Bienes',
+      // '10' => 'Servicio',
+      // '11' => 'Por cuenta de tercero',
+      // '12' => 'Dación en pago',
+      // '13' => 'Pago por subrogación',
+      // '14' => 'Pago por consignación',
+      // '15' => 'Condonación',
+      // '16' => 'Cancelación',
+      // '17' => 'Compensación',
+      // '98' => 'NA',
+      // '99' => 'Otros'
+    ];
+
+    if (isset($codigo{0})) {
+      return isset($metodosPagos[$codigo])? $codigo.' - '.$metodosPagos[$codigo]: $codigo;
+    } elseif (isset($nombre{0})) {
+      $codigo = array_search($nombre, $metodosPagos);
+      return $codigo === false? $nombre: $codigo;
+    } else {
+      return $metodosPagos;
+    }
+  }
+
 	/**
 	 * Da formato numerico a una cadena
 	 * @param unknown_type $number
@@ -30,7 +77,7 @@ class String{
 		$number = str_replace(array('$', ','), '', $number);
 		return number_format($number, $decimales, '.', '');
 	}
-	
+
 	/**
 	 * Obtiene las variables get y las prepara para los links
 	 * @param unknown_type $quit
@@ -41,10 +88,10 @@ class String{
 			if(array_search($key, $quit) === false)
 				$vars .= '&'.$key.'='.$val;
 		}
-		
+
 		return substr($vars, 1);
 	}
-	
+
 	/**
 	 * Valida si una cadena es una fecha valida 
 	 * y regresa en formato correcto
@@ -513,7 +560,7 @@ class String{
 		// 		++$dia;
 		// 	}
 		// }
-	
+
 		return $data;
 	}
 	public static function obtenerDiaSemana($fecha){

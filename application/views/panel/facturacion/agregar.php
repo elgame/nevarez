@@ -175,7 +175,7 @@
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w100">
 						<label for="dno_certificado">*No Certificado</label> <br>
-						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado') ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
+						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado',$no_certificado) ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
 					</div>
 				</div>
 			</div>
@@ -212,11 +212,12 @@
 					<label for="dmetodo_pago">*Metodo de Pago</label> <br>
 					<select name="dmetodo_pago" id="dmetodo_pago" class="a-c">
 						<option value="">--------------------------------------</option>
-						<option value="efectivo" <?php echo set_select('dmetodo_pago', 'efectivo'); ?>>Efectivo</option>
-						<option value="cheque" <?php echo set_select('dmetodo_pago', 'cheque'); ?>>Cheque</option>
-						<option value="tarjeta de crédito o debito" <?php echo set_select('dmetodo_pago', 'tarjeta de credito o debito'); ?>>Tarjeta de crédito o debito</option>
-						<option value="depósito en cuenta" <?php echo set_select('dmetodo_pago', 'deposito en cuenta'); ?>>Depósito en cuenta</option>
-						<option value="transferencia" <?php echo set_select('dmetodo_pago', '"transferencia"'); ?>>Transferencia</option>
+						<?php
+              $metodo = isset($borrador) ? $borrador['info']->metodo_pago : '';
+             ?>
+             <?php foreach (String::getMetodoPago() as $key => $mtp) { ?>
+              <option value="<?php echo $key ?>" <?php echo set_select('dmetodo_pago', $key); ?>><?php echo $key.' - '.$mtp ?></option>
+            <?php } ?>
 
 					</select>
 					<div class="w100" id="show_pago_digitos" style="display:none;">
