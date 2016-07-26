@@ -175,7 +175,7 @@
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w100">
 						<label for="dno_certificado">*No Certificado</label> <br>
-						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado',$no_certificado) ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
+						<input type="text" name="dno_certificado" id="dno_certificado" value="<?php echo set_value('dno_certificado') ?>" class="a-c not" size="25" maxlength="100" style="color:blue;" readonly>
 					</div>
 				</div>
 			</div>
