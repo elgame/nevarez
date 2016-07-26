@@ -48,7 +48,7 @@
 			</p>
 			<p class="f-l w50">
 				<label for="fplazo_credito">*Plazo de crédito:</label> <br>
-				<input type="number" name="fplazo_credito" id="fplazo_credito" class="vpositive" 
+				<input type="number" name="fplazo_credito" id="fplazo_credito" class="vpositive"
 					value="<?php echo set_value('fplazo_credito', 0); ?>" size="15" min="0" max="120"> días
 			</p>
 			<p class="f-l w50">
@@ -69,7 +69,7 @@
 					</div>
 				</p>
 			</fieldset>
-			
+
 			<div class="clear"></div>
 			<table class="tblListados corner-all8" id="tbl_tickets">
 				<tr class="header btn-gray">
@@ -80,7 +80,7 @@
 					<td>Precio</td>
 					<td>Importe</td>
 					<td>Opc</td>
-				</tr>							
+				</tr>
 			</table>
 			<table class="tblListados corner-all8 f-r" style="margin-right:1%;text-align:center;">
 				<tr>
@@ -105,9 +105,9 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		<div class="w25 f-l b-l">
-		
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<label for="dfecha">*Fecha</label> <br>
@@ -122,7 +122,7 @@
 					<div class="clear"></div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
                 	<div class="w100 f-l">
@@ -156,7 +156,7 @@
 					<div class="clear"></div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w50 f-l">
@@ -170,7 +170,7 @@
 					<div class="clear"></div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w100">
@@ -179,7 +179,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<div class="w100 f-l">
@@ -191,7 +191,7 @@
 					<div class="clear"></div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<label for="dforma_pago">*Forma de Pago</label> <br>
@@ -206,7 +206,7 @@
 					<div class="clear"></div>
 				</div>
 			</div>
-			
+
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<label for="dmetodo_pago">*Metodo de Pago</label> <br>
@@ -217,7 +217,7 @@
 						<option value="tarjeta de crédito o debito" <?php echo set_select('dmetodo_pago', 'tarjeta de credito o debito'); ?>>Tarjeta de crédito o debito</option>
 						<option value="depósito en cuenta" <?php echo set_select('dmetodo_pago', 'deposito en cuenta'); ?>>Depósito en cuenta</option>
 						<option value="transferencia" <?php echo set_select('dmetodo_pago', '"transferencia"'); ?>>Transferencia</option>
-						
+
 					</select>
 					<div class="w100" id="show_pago_digitos" style="display:none;">
 						<label for="dmetodo_pago_digitos">*Últimos 4 dígitos</label> <br>
@@ -228,11 +228,11 @@
 				<input type="button" name="enviar" value="Guardar" class="btn-blue corner-all" id="submit">
 				<img src="<?php echo base_url('application/images/loader.gif'); ?>" id="submitLoader" style="display:none;">
 			</div>
-			
-			
+
+
 		</div>
-		
-	</form>	
+
+	</form>
 </div>
 
 <div id="container" style="display:none">
@@ -246,14 +246,14 @@
 </div>
 <!-- Bloque de alertas -->
 <?php if(isset($frm_errors)){
-	if($frm_errors['msg'] != ''){ 
+	if($frm_errors['msg'] != ''){
 ?>
 
 <script type="text/javascript" charset="UTF-8">
 $(function(){
 	create("withIcon", {
-		title: '<?php echo $frm_errors['title']; ?>', 
-		text: '<?php echo $frm_errors['msg']; ?>', 
+		title: '<?php echo $frm_errors['title']; ?>',
+		text: '<?php echo $frm_errors['msg']; ?>',
 		icon: '<?php echo base_url('application/images/alertas/'.$frm_errors['ico'].'.png'); ?>' });
 });
 </script>
