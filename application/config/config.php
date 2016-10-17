@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://localhost/nevarez/';
+$config['base_url']	= 'http://192.168.1.100/nevarez/';
 
 /*
 |--------------------------------------------------------------------------
@@ -127,7 +127,7 @@ function __autoload($class_name) {
 			include_once(APPPATH.$clasePath.$class_name.'.php');
 		}else{
 			$class_name_lower = strtolower($class_name);
-				
+
 			//hacemos un ?ltimo intento pero con FirstCharUpper
 			if(file_exists(APPPATH.$clasePath.$class_name_lower.'.php')){
 				include_once(APPPATH.$clasePath.$class_name_lower.'.php');
