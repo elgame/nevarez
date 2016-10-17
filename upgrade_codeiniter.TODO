@@ -1,0 +1,3 @@
+ ☐ Upgrade 2.1.0 => 2.2.6
+   ALTER TABLE ci_sessions ALTER COLUMN ip_address TYPE character varying(45);
+   copiar application/config/mimes.php
