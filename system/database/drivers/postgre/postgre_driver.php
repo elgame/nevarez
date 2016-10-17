@@ -5,8 +5,9 @@
  * An open source application development framework for PHP 5.1.6 or newer
  *
  * @package		CodeIgniter
- * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
+ * @author		EllisLab Dev Team
+ * @copyright		Copyright (c) 2008 - 2014, EllisLab, Inc.
+ * @copyright		Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -25,7 +26,7 @@
  * @package		CodeIgniter
  * @subpackage	Drivers
  * @category	Database
- * @author		ExpressionEngine Dev Team
+ * @author		EllisLab Dev Team
  * @link		http://codeigniter.com/user_guide/database/
  */
 class CI_DB_postgre_driver extends CI_DB {
@@ -172,14 +173,8 @@ class CI_DB_postgre_driver extends CI_DB {
 	 */
 	function _execute($sql)
 	{
-		$band = true;
 		$sql = $this->_prep_query($sql);
-		// if(preg_match("/^(insert|update|delete) /i", $sql)){
-		// 	if(pg_query($this->conn_id, "INSERT INTO actualizaciones (sql) VALUES ('".addslashes($sql)."')"))
-		// 		$band = true;
-		// }
-		if($band)
-			return @pg_query($this->conn_id, $sql);
+		return @pg_query($this->conn_id, $sql);
 	}
 
 	// --------------------------------------------------------------------
