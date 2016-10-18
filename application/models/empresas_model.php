@@ -1,7 +1,7 @@
 <?php
 
 class empresas_model extends CI_Model{
-	private $pass_finkok = 'gamaL1!l'; //F4ctur4rt!
+	private $pass_finkok = 'F4ctur4rt!'; //F4ctur4rt! | gamaL1!l
 
 	function __construct(){
 		parent::__construct();
@@ -103,7 +103,7 @@ class empresas_model extends CI_Model{
 		$path_img = '';
 		//valida la imagen
 		$upload_res = UploadFiles::uploadEmpresaLogo();
-		
+
 		if(is_array($upload_res)){
 			if($upload_res[0] == false)
 				return array(false, $upload_res[1]);
