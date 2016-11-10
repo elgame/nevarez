@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://192.168.1.100/nevarez/';
+$config['base_url']	= 'http://localhost/nevarez/';
 
 /*
 |--------------------------------------------------------------------------

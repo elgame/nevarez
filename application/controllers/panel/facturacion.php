@@ -87,8 +87,8 @@ class facturacion extends MY_Controller {
     }
 
 	private function ajax_get_seriesfromempresa(){//ESTA FUNCION ES NUEVA JORGE
-		$id_empresa = (intval($_POST['id_empresa'])>0)? intval($_POST['id_empresa']) : 0;
-		$query = $this->db->query("SELECT id_serie_folio, (COALESCE(leyenda,'') || '-' || serie) as serie FROM facturacion_series_folios where id_empresa = $id_empresa");
+		$id_empresa = ($_POST['id_empresa']!='')? $_POST['id_empresa'] : 0;
+		$query = $this->db->query("SELECT id_serie_folio, (COALESCE(leyenda,'') || '-' || serie) as serie FROM facturacion_series_folios where id_empresa = '$id_empresa'");
 
 		$res = $query->result();
 		$output = '<option value="">---------------------------</option>';
