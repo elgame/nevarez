@@ -500,7 +500,7 @@ class cfdi{
 		$data = $CI->db->query(
       "SELECT *
        FROM {$table}
-       WHERE {$pkey} = {$id}"
+       WHERE {$pkey} = '{$id}'"
     )->row();
 
 		$this->path_certificado_org = $data->cer_org;
