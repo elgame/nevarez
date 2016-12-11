@@ -763,7 +763,7 @@ class facturacion_model extends privilegios_model{
           elseif ($timbrado->codigo === '500')
             $result['msg'] = 'Error en el servidor del timbrado. Pongase en contacto con el equipo de desarrollo del sistema.';
           else
-            $result['msg'] = 'Ocurrio un error al intentar timbrar la factura, verifique los datos fiscales de la empresa y/o cliente.';
+            $result['msg'] = $timbrado->mensaje;
 
           $result['passes'] = false;
         }
