@@ -1401,7 +1401,7 @@ class facturacion_model extends privilegios_model{
 
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY(109, $pdf->GetY() + 4);
-        $pdf->Cell(108, 4, $xml->Complemento->TimbreFiscalDigital[0]['noCertificadoSAT'], 0, 0, 'C', 0);
+        $pdf->Cell(108, 4, $xml[0]['noCertificado'], 0, 0, 'C', 0);
 
         $pdf->SetFillColor(140,140, 140);
         $pdf->SetTextColor(255,255,255);
