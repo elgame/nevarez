@@ -366,8 +366,8 @@ class facturacion extends MY_Controller {
                 //valido la fecha que caduca el certificado
                 $this->load->library('cfd');
                 $res = $this->db->query("SELECT Count(id) AS t
-                                  FROM nv_fiscal
-                                  WHERE id='".$this->cfd->default_nv_fiscal."'
+                                  FROM empresas
+                                  WHERE id='".$_POST['id_empresa']."'
                                    AND cer_caduca > Date(now())");
                 if ($res->row()->t == 0)
                     $e = 2;
