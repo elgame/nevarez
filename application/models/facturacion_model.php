@@ -1401,7 +1401,7 @@ class facturacion_model extends privilegios_model{
 
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY(109, $pdf->GetY() + 4);
-        $pdf->Cell(108, 4, $xml->Complemento->TimbreFiscalDigital[0]['noCertificadoSAT'], 0, 0, 'C', 0);
+        $pdf->Cell(108, 4, $xml[0]['noCertificado'], 0, 0, 'C', 0);
 
         $pdf->SetFillColor(140,140, 140);
         $pdf->SetTextColor(255,255,255);
@@ -1945,8 +1945,8 @@ class facturacion_model extends privilegios_model{
 
             $correoEmisorEm = "fumigacionesaereasnevarez@gmail.com"; // Correo con el q se emitira el correo.
             $nombreEmisor   = $factura['nombre_fiscal'];
-            $correoEmisor   = "fumigacionesaereasnevarez@gmail.com"; // Correo para el auth.
-            $contrasena     = "4AIjcF83BCUZgfF3FpoLlw"; // Contraseña de $correEmisor n3v4r3zr | 4AIjcF83BCUZgfF3FpoLlw (n3v4r3zr4d)
+            $correoEmisor   = "postmaster@aerofumigacionesnevarez.com"; // Correo para el auth. Gmail y mailgun (nevarezaerofumiga@gmail.com | N3V4R3zgoz)
+            $contrasena     = "52c5991366b2651c05dd4c851f265fdb"; // Contraseña de $correEmisor n3v4r3zr | 4AIjcF83BCUZgfF3FpoLlw (n3v4r3zr4d)
 
             ////////////////////////
             // Datos del Receptor //
