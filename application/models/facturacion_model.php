@@ -1852,7 +1852,7 @@ class facturacion_model extends privilegios_model{
         $serie   = $factura['serie'] !== '' ? $factura['serie'].'-' : '';
         $folio   = $factura['folio'];
 
-		//echo APPPATH."documentos/CLIENTES/{$cliente}/{$ano}/{$mes}/FACT-{$serie}{$folio}/"; exit;
+		  //echo APPPATH."documentos/CLIENTES/{$cliente}/{$ano}/{$mes}/FACT-{$serie}{$folio}/"; exit;
         $pathDocs = APPPATH."documentos/CLIENTES/{$cliente}/{$ano}/{$mes}/FACT-{$serie}{$folio}/";
 
         // Scanea el directorio para obtener los archivos.

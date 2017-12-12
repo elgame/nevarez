@@ -185,7 +185,8 @@
 					<div class="w100 f-l">
 						<label for="dtipo_comprobante">*Tipo de Comprobante</label> <br>
 						<select name="dtipo_comprobante" id="dtipo_comprobante">
-							<option value="ingreso" <?php echo set_select('dtipo_comprobante', 'ingreso'); ?>>Ingreso</option>
+              <option value="ingreso" <?php echo set_select('dtipo_comprobante', 'ingreso'); ?>>Ingreso</option>
+							<option value="egreso" <?php echo set_select('dtipo_comprobante', 'egreso'); ?>>Egreso</option>
 						</select>
 					</div>
 					<div class="clear"></div>
@@ -195,11 +196,15 @@
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<label for="dforma_pago">*Forma de Pago</label> <br>
-					<select name="dforma_pago" id="dforma_pago" class="a-c">
-						<option value="">--------------------------------------</option>
-						<option value="0" <?php echo set_select('dforma_pago', '0'); ?>>Pago en una sola exhibición</option>
-						<option value="1" <?php echo set_select('dforma_pago', '1'); ?>>Parcialidad 1 de X</option>
-					</select>
+          <select name="dforma_pago" class="span9" id="dforma_pago">
+            <option value="">--------------------------------------</option>
+            <?php
+            $formap = isset($borrador) ? $borrador['info']->forma_pago : '';
+            foreach ($formaPago as $key => $frp) {
+            ?>
+              <option value="<?php echo $frp['key'] ?>" <?php echo set_select('dforma_pago', $frp['key'], $formap == $frp['key'] ? true : false); ?>><?php echo $frp['key'].' - '.$frp['value'] ?></option>
+            <?php } ?>
+          </select>
 					<div class="w100" id="show_parcialidad" style="display:none;">
 						<input type="text" name="dforma_pago_parcialidad" id="dforma_pago_parcialidad" value="<?php echo set_value('dforma_pago_parcialidad') ?>" class="a-c not" size="22" maxlength="80">
 					</div>
@@ -210,26 +215,49 @@
 			<div class="frmsec-right w100 f-l">
 				<div class="frmbox-r p5-tb corner-right8">
 					<label for="dmetodo_pago">*Metodo de Pago</label> <br>
-					<select name="dmetodo_pago" id="dmetodo_pago" class="a-c">
-						<option value="">--------------------------------------</option>
-						<?php
+          <select name="dmetodo_pago" class="span9" id="dmetodo_pago">
+            <option value="">--------------------------------------</option>
+            <?php
               $metodo = isset($borrador) ? $borrador['info']->metodo_pago : '';
              ?>
-             <?php foreach (String::getMetodoPago() as $key => $mtp) { ?>
-              <option value="<?php echo $key ?>" <?php echo set_select('dmetodo_pago', $key); ?>><?php echo $key.' - '.$mtp ?></option>
+            <?php foreach ($metodosPago as $key => $mtp) { ?>
+              <option value="<?php echo $mtp['key'] ?>" <?php echo set_select('dmetodo_pago', $mtp['key'], $metodo === $mtp['key'] ? true : false); ?>><?php echo $mtp['key'].' - '.$mtp['value'] ?></option>
             <?php } ?>
-
-					</select>
+          </select>
 					<div class="w100" id="show_pago_digitos" style="display:none;">
 						<label for="dmetodo_pago_digitos">*Últimos 4 dígitos</label> <br>
 						<input type="text" name="dmetodo_pago_digitos" id="dmetodo_pago_digitos" value="<?php echo set_value('dmetodo_pago_digitos') ?>" class="a-c not" size="10" maxlength="4" style="color:red;">
 					</div>
 					<div class="clear"></div>
 				</div>
-				<input type="button" name="enviar" value="Guardar" class="btn-blue corner-all" id="submit">
-				<img src="<?php echo base_url('application/images/loader.gif'); ?>" id="submitLoader" style="display:none;">
 			</div>
 
+      <?php
+      if (!isset($borrador) || (isset($borrador) && $borrador['info']->version > 3.2)) {
+      ?>
+      <div class="frmsec-right w100 f-l">
+        <div class="frmbox-r p5-tb corner-right8">
+          <div class="w100 f-l">
+            <label for="duso_cfdi">*Uso de CFDI</label> <br>
+            <select name="duso_cfdi" class="w90" id="duso_cfdi">
+              <option value="">--------------------------------------</option>
+              <?php
+                $metodo = isset($borrador) ? $borrador['info']->cfdi_ext->uso_cfdi : '';
+               ?>
+              <?php foreach ($usoCfdi as $key => $usoCfdi) { ?>
+                <option value="<?php echo $usoCfdi['key'] ?>" <?php echo set_select('duso_cfdi', $usoCfdi['key'], $metodo === $usoCfdi['key'] ? true : false); ?>><?php echo $usoCfdi['key'].' - '.$usoCfdi['value'] ?></option>
+              <?php } ?>
+            </select>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+      <?php }?>
+
+      <div class="frmsec-right w100 f-l">
+        <input type="button" name="enviar" value="Guardar" class="btn-blue corner-all" id="submit">
+        <img src="<?php echo base_url('application/images/loader.gif'); ?>" id="submitLoader" style="display:none;">
+      </div>
 
 		</div>
 

@@ -1,7 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class empresas extends MY_Controller {
-	
+
 	/**
 	 * Evita la validacion (enfocado cuando se usa ajax). Ver mas en privilegios_model
 	 * @var unknown_type
@@ -48,7 +48,7 @@ class empresas extends MY_Controller {
 			array('libs/jquery.msgbox.min.js'),
 			array('general/msgbox.js')
 		));
-		
+
 		$this->load->model('empresas_model');
 		$this->load->library('pagination');
 
@@ -59,7 +59,7 @@ class empresas extends MY_Controller {
 		);
 
 		$params['empresas'] = $this->empresas_model->getEmpresas();
-		
+
 		if(isset($_GET['msg']{0}))
 			$params['frm_errors'] = $this->showMsgs($_GET['msg']);
 
@@ -101,6 +101,9 @@ class empresas extends MY_Controller {
 			else
 				$params['frm_errors'] = $this->showMsgs(2, $respons[1]);
 		}
+
+    $this->load->model('catalogos33_model');
+    $params['regimen_fiscales'] = $this->catalogos33_model->regimenFiscales();
 
 		if(isset($_GET['msg']{0}))
 			$params['frm_errors'] = $this->showMsgs($_GET['msg']);
@@ -150,8 +153,11 @@ class empresas extends MY_Controller {
 
 		if(isset($_GET['msg']{0}))
 			$params['frm_errors'] = $this->showMsgs($_GET['msg']);
-		
-		
+
+    $this->load->model('catalogos33_model');
+    $params['regimen_fiscales'] = $this->catalogos33_model->regimenFiscales();
+
+
 		$this->load->view('panel/header', $params);
 		$this->load->view('panel/general/menu', $params);
 		$params['html_form'] = $this->load->view('panel/empresas/frmAgregarEmpresa', $params, true);
