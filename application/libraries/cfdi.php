@@ -483,6 +483,315 @@ class cfdi{
   }
 
 
+  public function obtenDatosCfdi33($data, $productosApi, $id_nc = false)
+  {
+    $CI =& get_instance();
+
+    // Obtiene el ID de la empresa que emite la factura, si no llega
+    // entonces obtiene el ID por default.
+    // $id_empresa = isset($data['id_empresa']) ? $data['id_empresa'] : $this->default_id_empresa;
+    $id = isset($data['didempresa']) ? $data['didempresa'] : $this->default_id_empresa;
+
+    // Carga los datos de la empresa que emite la factura.
+    $this->cargaDatosFiscales($id, 'empresas');
+
+    // Obtiene los datos del receptor.
+    $CI->load->model('clientes_model');
+    $cliente = $CI->clientes_model->getInfoCliente($_POST['hcliente'], true);
+
+    if ($id_nc) {
+      // Obtiene los datos de la factura.
+      $CI->load->model('facturacion_model');
+      $factura = $CI->facturacion_model->getInfoFactura($id_nc, true);
+
+      $cfdiRel = array(
+        'tipoRelacion' => '01',
+        'cfdiRelacionado' => array(
+          array(
+            'uuid' => $factura['info']->uuid,
+          )
+        ),
+      );
+    }
+
+    // $CI->load->model('catalogos33_model');
+    // $this->regimen_fiscal = $CI->catalogos33_model->regimenFiscales($this->regimen_fiscal);
+
+    $tipoComprobante = 'I';
+    if ($data['dtipo_comprobante'] == 'ingreso')
+      $tipoComprobante = 'I';
+    elseif ($data['dtipo_comprobante'] == 'egreso')
+      $tipoComprobante = 'E';
+    elseif ($data['dtipo_comprobante'] == 'traslado')
+      $tipoComprobante = 'T';
+    elseif ($data['dtipo_comprobante'] == 'nomina')
+      $tipoComprobante = 'N';
+
+    $productos = [];
+    foreach ($productosApi as $key => $value) {
+      $productos[] = array(
+        'claveProdServ'           => $value['claveProducto']['key'],
+        'claveProdServValue'      => $value['claveProducto']['value'],
+        'claveUnidad'             => $value['claveUnidad']['key'],
+        'claveUnidadValue'        => $value['claveUnidad']['value'],
+        'unidad'                  => $value['unidad'],
+        'cantidad'                => $value['cantidad'],
+        'concepto'                => $value['descripcion'],
+        'cuentaPredial'           => '',
+        'descuentoProd'           => '0',
+        'descuentoProdPorcent'    => '0',
+        'importe'                 => $value['importe'],
+        'noIdentificacion'        => '',
+        'retencionCedular'        => '0',
+        'retencionCedularPorcent' => '0',
+        'retencionIsr'            => '0',
+        'retencionIsrPorcent'     => '0',
+        'retencionIva'            => '0',
+        'retencionIvaPorcent'     => '0',
+        'retencionIvc'            => '0',
+        'retencionIvcPorcent'     => '0',
+        'trasladoCedular'         => '0',
+        'trasladoCedularPorcent'  => '0',
+        'trasladoIeps'            => '0',
+        'trasladoIepsPorcent'     => '0',
+        'trasladoIsh'             => '0',
+        'trasladoIshPorcent'      => '0',
+        'trasladoIva'             => $value['importeIva'],
+        'trasladoIvaPorcent'      => $value['tazaIva'],
+        'valorUnitario'           => $value['valorUnitario'],
+      );
+    }
+
+    $datosApi = array(
+      'emisor' => array(
+        'nombreFiscal'  => $this->nombre_fiscal,
+        'rfc'           => $this->rfc,
+        'calle'         => $this->calle,
+        'noExterior'    => $this->no_exterior,
+        'noInterior'    => $this->no_interior,
+        'colonia'       => $this->colonia,
+        'localidad'     => $this->localidad,
+        'municipio'     => $this->municipio,
+        'estado'        => $this->estado,
+        'pais'          => $this->pais,
+        'cp'            => $this->cp,
+        'regimenFiscal' => $this->regimen_fiscal,
+        'cer'           => $this->obtenCer($this->path_certificado),
+        'key'           => $this->obtenKey($this->path_key),
+      ),
+      'receptor' => array(
+        'nombreFiscal' => $cliente['info']->nombre_fiscal,
+        'rfc'          => $cliente['info']->rfc,
+        'calle'        => $cliente['info']->calle,
+        'noExterior'   => $cliente['info']->no_exterior,
+        'noInterior'   => $cliente['info']->no_interior,
+        'colonia'      => $cliente['info']->colonia,
+        'localidad'    => $cliente['info']->localidad,
+        'municipio'    => $cliente['info']->municipio,
+        'estado'       => $cliente['info']->estado,
+        'pais'         => 'MEXICO',
+        'cp'           => $cliente['info']->cp,
+      ),
+      'serie'             => $data['dserie'],
+      'folio'             => $data['dfolio'],
+      'fecha'             => $data['dfecha'],
+      'formaDePago'       => $data['dforma_pago'],
+      'condicionesDePago' => $data['dcondicion_pago'] == 'credito'? 'CREDITO': 'CONTADO',
+      'moneda'            => 'MXN',
+      'tipoCambio'        => 1,
+      'tipoDeComprobante' => $tipoComprobante,
+      'metodoDePago'      => $data['dmetodo_pago'],
+      'confirmacion'      => '',
+      'usoCfdi'           => $data['duso_cfdi'],
+      'noCertificado'     => $data['dno_certificado'],
+      'totalImporte'      => $data['subtotal'],
+      'descuento'         => '0',
+      'total'             => $data['total'],
+      'trasladosImporte'  => array(
+        'iva' => $data['iva']
+      ),
+      'retencionesImporte'  => array(
+        'isr' => $data['total_isr']
+      ),
+      'productos' => $productos
+    );
+
+    if (isset($cfdiRel) && $cfdiRel) {
+      $datosApi['cfdiRelacionados'] = $cfdiRel;
+    }
+
+    return $datosApi;
+  }
+
+  public function obtenDatosCfdi33ComP($data, $cuentaCliente)
+  {
+    // echo "<pre>";
+    //   var_dump($data, $cuentaCliente);
+    // echo "</pre>";exit;
+    $CI =& get_instance();
+
+    // Obtiene el ID de la empresa que emite la factura, si no llega
+    // entonces obtiene el ID por default.
+    $id = isset($data[0]->id_empresa) ? $data[0]->id_empresa : $this->default_id_empresa;
+    // Carga los datos de la empresa que emite la factura.
+    $this->cargaDatosFiscales($id, 'empresas');
+
+    // Obtiene los datos del receptor.
+    $CI->load->model('clientes_model');
+    $cliente = $CI->clientes_model->getClienteInfo($data[0]->id_cliente, true);
+
+    $CI->load->model('cuentas_cobrar_model');
+
+    $cfdi_ext = json_decode($data[0]->cfdi_ext);
+
+    $formaDePago = '03';
+    if ($data[0]->forma_pago == 'transferencia')
+      $formaDePago = '03';
+    elseif ($data[0]->forma_pago == 'cheque')
+      $formaDePago = '02';
+    elseif ($data[0]->forma_pago == 'efectivo')
+      $formaDePago = '01';
+
+    $cfdiRel = array(
+      'tipoRelacion' => '07',
+      'cfdiRelacionado' => array(),
+    );
+    $comPago = [
+      'cadenaPago'        => "",
+      'certificadoPago'   => "",
+      'cuentaBen'         => $data[0]->num_cuenta,
+      'cuentaOrd'         => $cuentaCliente->cuenta,
+      'fechaPago'         => str_replace(' ', 'T', substr($data[0]->fecha, 0, 19)),
+      'formaDePago'       => $formaDePago,
+      'moneda'            => $cfdi_ext->moneda,
+      'monto'             => $data[0]->pago,
+      'nombreBancoOrdExt' => "",
+      'numOperacion'      => "1",
+      'rfcEmisorCtaBen'   => $data[0]->rfc,
+      'rfcEmisorCtaOrd'   => $cuentaCliente->rfc,
+      'selloPago'         => "",
+      'tipoCadPago'       => "",
+      'tipoCambio'        => $cfdi_ext->tipoCambio,
+      'doctoRelacionado'  => []
+    ];
+    foreach ($data as $key => $pago) {
+      if (floatval($pago->version) > 3.2) {
+        $cfdiRel['cfdiRelacionado'][] = array(
+          'uuid' => $pago->uuid,
+        );
+
+        $saldo_factura = $CI->cuentas_cobrar_model->getDetalleVentaFacturaData($pago->id_factura, 'f', true, true);
+        $saldo_factura['saldo'] = floor($saldo_factura['saldo']*100)/100;
+        $saldoAnt = ($saldo_factura['saldo']+$pago->pago_factura);
+        $metodoDePago = 'PPD';
+        if ($saldo_factura['saldo'] == 0 && $pago->parcialidades == 1)
+          $metodoDePago = 'PUE';
+        $comPago['doctoRelacionado'][] = array(
+          "idDocumento"    => $pago->uuid,
+          "serie"          => $pago->serie,
+          "folio"          => $pago->folio,
+          "moneda"         => $cfdi_ext->moneda,
+          "tipoCambio"     => $cfdi_ext->tipoCambio,
+          "metodoDePago"   => $metodoDePago,
+          "numParcialidad" => $pago->parcialidades,
+          "saldoAnterior"  => $saldoAnt,
+          "importePagado"  => $pago->pago_factura,
+          "saldoInsoluto"  => $saldo_factura['saldo']
+        );
+      }
+    }
+
+    $noCertificado = $this->obtenNoCertificado();
+
+    // xml 3.3
+    $datosApi = array(
+      'emisor' => array(
+        'nombreFiscal'  => $this->nombre_fiscal,
+        'rfc'           => $this->rfc,
+        'calle'         => $this->calle,
+        'noExterior'    => $this->no_exterior,
+        'noInterior'    => $this->no_interior,
+        'colonia'       => $this->colonia,
+        'localidad'     => $this->localidad,
+        'municipio'     => $this->municipio,
+        'estado'        => $this->estado,
+        'pais'          => $this->pais,
+        'cp'            => $this->cp,
+        'regimenFiscal' => $this->regimen_fiscal,
+        'cer'           => $this->obtenCer($this->path_certificado),
+        'key'           => $this->obtenKey($this->path_key),
+      ),
+      'receptor' => array(
+        'nombreFiscal' => $cliente['info']->nombre_fiscal,
+        'rfc'          => $cliente['info']->rfc,
+        'calle'        => $cliente['info']->calle,
+        'noExterior'   => $cliente['info']->no_exterior,
+        'noInterior'   => $cliente['info']->no_interior,
+        'colonia'      => $cliente['info']->colonia,
+        'localidad'    => $cliente['info']->localidad,
+        'municipio'    => $cliente['info']->municipio,
+        'estado'       => $cliente['info']->estado,
+        'pais'         => $cliente['info']->pais,
+        'cp'           => $cliente['info']->cp,
+      ),
+      'serie'             => 'P',
+      'folio'             => $cuentaCliente->folio,
+      'fecha'             => date("Y-m-d\TH:i:s"),
+      'formaDePago'       => '03',
+      'condicionesDePago' => 'CONTADO',
+      'moneda'            => 'XXX',
+      'tipoCambio'        => '1',
+      'tipoDeComprobante' => 'P',
+      'metodoDePago'      => 'PUE',
+      'confirmacion'      => '',
+      'usoCfdi'           => 'P01',
+      'noCertificado'     => $noCertificado,
+      'totalImporte'      => '0',
+      'descuento'         => '0',
+      'total'             => '0',
+      'trasladosImporte'  => array(
+        'iva' => '0'
+      ),
+      'productos' => [
+        array(
+          'claveProdServ'           => '84111506',
+          'claveUnidad'             => 'ACT',
+          'unidad'                  => 'ACT',
+          'cantidad'                => '1',
+          'concepto'                => 'Pago',
+          'cuentaPredial'           => '',
+          'descuentoProd'           => '0',
+          'descuentoProdPorcent'    => '0',
+          'importe'                 => '0',
+          'noIdentificacion'        => '',
+          'retencionCedular'        => '0',
+          'retencionCedularPorcent' => '0',
+          'retencionIsr'            => '0',
+          'retencionIsrPorcent'     => '0',
+          'retencionIva'            => '0',
+          'retencionIvaPorcent'     => '0',
+          'retencionIvc'            => '0',
+          'retencionIvcPorcent'     => '0',
+          'trasladoCedular'         => '0',
+          'trasladoCedularPorcent'  => '0',
+          'trasladoIeps'            => '0',
+          'trasladoIepsPorcent'     => '0',
+          'trasladoIsh'             => '0',
+          'trasladoIshPorcent'      => '0',
+          'trasladoIva'             => '0',
+          'trasladoIvaPorcent'      => '0',
+          'valorUnitario'           => '0',
+        )
+      ],
+      'pagos' => [$comPago]
+    );
+    if ($cfdiRel) {
+      $datosApi['cfdiRelacionados'] = $cfdiRel;
+    }
+
+    return $datosApi;
+  }
+
   /**
    * Carga los datos fiscales de la empresa|proveedor que emitira la factura.
    *

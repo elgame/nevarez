@@ -311,259 +311,262 @@ class facturacion extends MY_Controller {
     $params['cadena'] = $res;
   }
 
-  $params['seo']['titulo'] = 'Reporte Mensual';
-  if(isset($_GET['msg']{0}))
-   $params['frm_errors'] = $this->showMsgs($_GET['msg']);
+    $params['seo']['titulo'] = 'Reporte Mensual';
+    if(isset($_GET['msg']{0}))
+     $params['frm_errors'] = $this->showMsgs($_GET['msg']);
 
- $this->load->view('panel/header',$params);
- $this->load->view('panel/general/menu', $params);
- $this->load->view('panel/facturacion/reporte_mensual',$params);
- $this->load->view('panel/footer');
-}
+    $this->load->view('panel/header',$params);
+    $this->load->view('panel/general/menu', $params);
+    $this->load->view('panel/facturacion/reporte_mensual',$params);
+    $this->load->view('panel/footer');
+  }
 
-private function descargar_rm(){
- $this->load->library('cfd');
- $this->cfd->descargaReporte($_GET['fano'],$_GET['fmes']);
-}
+  private function descargar_rm(){
+    $this->load->library('cfd');
+    $this->cfd->descargaReporte($_GET['fano'],$_GET['fmes']);
+  }
 
-private function pdf_rm() {
- $this->load->model('facturacion_model');
- $this->facturacion_model->getPdfReporteMensual();
-}
+  private function pdf_rm() {
+    $this->load->model('facturacion_model');
+    $this->facturacion_model->getPdfReporteMensual();
+  }
 
-public function configAddPago(){
-  $this->load->library('form_validation');
-  $rules = array(
-    array('field' => 'ffecha',
-      'label' => 'Fecha',
-      'rules' => 'required|max_length[10]|callback_isValidDate'),
-    array('field' => 'fconcepto',
-      'label' => 'Concepto',
-      'rules' => 'required|max_length[200]')
-  );
+  public function configAddPago(){
+    $this->load->library('form_validation');
+    $rules = array(
+      array('field' => 'ffecha',
+        'label' => 'Fecha',
+        'rules' => 'required|max_length[10]|callback_isValidDate'),
+      array('field' => 'fconcepto',
+        'label' => 'Concepto',
+        'rules' => 'required|max_length[200]')
+    );
 
-  if (isset($_GET['tipo']))
-    $rules[] = array('field' => 'fabono',
-      'label' => 'Total a Abonar',
-      'rules' => 'required|callback_verifica_abono');
+    if (isset($_GET['tipo']))
+      $rules[] = array('field' => 'fabono',
+        'label' => 'Total a Abonar',
+        'rules' => 'required|callback_verifica_abono');
 
-  $this->form_validation->set_rules($rules);
-}
+    $this->form_validation->set_rules($rules);
+  }
 
-private function ajax_get_folio(){
-  if(isset($_POST['id'])){
-    if($_POST['id']!=''){
-      $this->load->model('facturacion_model');
-      $result = $this->facturacion_model->ajax_get_folio($_POST['id']);
-      echo json_encode($result);
-    }else echo json_encode(array(false,'msg'=>'Seleccione una Serie Valida'));
-  }else echo json_encode(array(false,'msg'=>'El campo ID es requerido'));
-}
+  private function ajax_get_folio(){
+    if(isset($_POST['id'])){
+      if($_POST['id']!=''){
+        $this->load->model('facturacion_model');
+        $result = $this->facturacion_model->ajax_get_folio($_POST['id']);
+        echo json_encode($result);
+      }else echo json_encode(array(false,'msg'=>'Seleccione una Serie Valida'));
+    }else echo json_encode(array(false,'msg'=>'El campo ID es requerido'));
+  }
 
-private function ajax_valida_folio(){
-  $e = 1;
-  if (isset($_POST['serie']) && isset($_POST['folio']{0}))
-  {
-    if ($_POST['serie'] != '' && $_POST['folio'] != '')
+  private function ajax_valida_folio(){
+    $e = 1;
+    if (isset($_POST['serie']) && isset($_POST['folio']{0}))
     {
-      $e = 0;
-      $res = $this->db->query("SELECT COUNT(id_factura) as t
-        FROM facturacion
-        WHERE serie='".$_POST['serie']."' AND
-        folio=".$_POST['folio']."");
-      if ($res->row()->t > 0)
-        $e = 1;
-        //valido la fecha que caduca el certificado
+      if ($_POST['serie'] != '' && $_POST['folio'] != '')
+      {
+        $e = 0;
+        $res = $this->db->query("SELECT COUNT(id_factura) as t
+          FROM facturacion
+          WHERE serie='".$_POST['serie']."' AND
+          folio=".$_POST['folio']."");
+        if ($res->row()->t > 0)
+          $e = 1;
+          //valido la fecha que caduca el certificado
+        $this->load->library('cfd');
+        $res = $this->db->query("SELECT Count(id_empresa) AS t
+          FROM empresas
+          WHERE id_empresa='".$_POST['id_empresa']."'
+          AND cer_caduca > Date(now())");
+        if ($res->row()->t == 0)
+          $e = 2;
+      }
+    }
+    echo $e;
+  }
+
+  private function ajax_get_total_tickets(){
+    $this->load->model('facturacion_model');
+    $params = $this->facturacion_model->ajax_get_total_tickets();
+    echo json_encode($params);
+  }
+
+  private function ajax_agrega_factura(){
+    $this->load->library('form_validation');
+
+    $rules = array(
+      array('field' => 'hcliente',
+        'label' => 'Cliente',
+        'rules' => 'required|max_length[25]'),
+      array('field' => 'dcliente',
+        'label' => 'Cliente',
+        'rules' => 'max_length[130]'),
+      array('field' => 'frfc',
+        'label' => 'RFC',
+        'rules' => 'max_length[13]'),
+      array('field' => 'fcalle',
+        'label' => 'Calle',
+        'rules' => 'max_length[60]'),
+      array('field' => 'fno_exterior',
+        'label' => 'No. Ext',
+        'rules' => 'max_length[7]'),
+      array('field' => 'fno_interior',
+        'label' => 'No. Int',
+        'rules' => 'max_length[7]'),
+      array('field'   => 'fcolonia',
+        'label'         => 'Colonia',
+        'rules'         => 'max_length[60]'),
+      array('field'   => 'flocalidad',
+        'label'         => 'Localidad',
+        'rules'         => 'max_length[45]'),
+      array('field'   => 'fmunicipio',
+        'label'         => 'Municipio',
+        'rules'         => 'max_length[45]'),
+      array('field'   => 'festado',
+        'label'         => 'Estado',
+        'rules'         => 'max_length[45]'),
+      array('field'   => 'fcp',
+        'label'         => 'CP',
+        'rules'         => 'max_length[10]'),
+      array('field'   => 'fpais',
+        'label'         => 'País',
+        'rules'         => 'max_length[60]'),
+      array('field'   => 'fplazo_credito',
+        'label'         => 'Plazo de Crédito',
+        'rules'         => 'required|is_natural'),
+      array('field'   => 'dfecha',
+        'label'         => 'Fecha',
+        'rules'         => 'required'),
+      array('field'   => 'dcondicion_pago',
+        'label'         => 'Condicion de Pago',
+        'rules'         => 'required'),
+      array('field'   => 'dleyendaserie',
+        'label'         => 'Leyenda-Serie',
+        'rules'         => 'required'),
+      array('field'   => 'dserie',
+        'label'         => 'Serie',
+        'rules'         => 'required|max_length[30]'),
+      array('field'   => 'dfolio',
+        'label'         => 'Folio',
+        'rules'         => 'required|is_natural'),
+      array('field'   => 'dano_aprobacion',
+        'label'         => 'Año de Aprobación',
+        'rules'         => 'required|max_length[4]|callback_isValidYear'),
+      array('field'   => 'dno_aprobacion',
+        'label'         => 'No. de Aprobación',
+        'rules'         => 'required|is_natural'),
+      array('field'   => 'dno_certificado',
+        'label'         => 'No. de Certificado',
+        'rules'         => 'required|max_length[100]'),
+      array('field'   => 'dtipo_comprobante',
+        'label'         => 'Tipo de Comprobante',
+        'rules'         => 'required|max_length[10]'),
+      array('field'   => 'dforma_pago',
+        'label'         => 'Forma de Pago',
+        'rules'         => 'required'),
+      array('field'   => 'dmetodo_pago',
+        'label'         => 'Metodo de Pago',
+        'rules'         => 'required'),
+      array('field'   => 'duso_cfdi',
+        'label'         => 'Uso de CFDI',
+        'rules'         => 'required'),
+      array('field'   => 'subtotal',
+        'label'         => 'Subtotal',
+        'rules'         => 'required'),
+      array('field'   => 'iva',
+        'label'         => 'Iva',
+        'rules'         => 'required'),
+      array('field'   => 'total_isr',
+        'label'         => 'ISR',
+        'rules'         => 'required'),
+      array('field'   => 'total',
+        'label'         => 'Total',
+        'rules'         => 'required'),
+      array('field'   => 'dttotal_letra',
+        'label'         => 'Importe con Letra',
+        'rules'         => 'max_length[250]'),
+      array('field'   => 'fobservaciones',
+        'label'         => 'Observaciones',
+        'rules'         => 'max_length[850]'),
+      array('field'   => 'tickets',
+        'label'         => 'Tickets',
+        'rules'         => 'required')
+    );
+
+    if(isset($_POST['dforma_pago']))
+      if($_POST['dforma_pago']==1)
+        $rules[] = array('field' => 'dforma_pago_parcialidad',
+          'label' => 'Formas de Pago',
+          'rules' => 'required|max_length[80]');
+
+      if(isset($_POST['dmetodo_pago']))
+        if($_POST['dmetodo_pago']!='efectivo' && $_POST['dmetodo_pago']!='')
+          $rules[] = array('field' => 'dmetodo_pago_digitos',
+            'label' => 'Ultimos 4 digitos',
+            'rules' => 'max_length[20]');
+
+    $this->form_validation->set_rules($rules);
+    if($this->form_validation->run() == FALSE)
+    {
+      $params['msg']  = $this->showMsgs(2,preg_replace("[\n|\r|\n\r]", '', validation_errors()));
+    }
+    else
+    {
+      $this->load->model('facturacion_model');
+      $params = $this->facturacion_model->addFactura();
+      if($params[0])
+        $params['msg'] = $this->showMsgs(4);
+      else{
+        $params['msg'] = $this->showMsgs(2, $params['resultado']['msg']);
+      }
+    }
+    echo json_encode($params);
+  }
+
+  private function ajax_actualiza_digitos(){
+    $this->load->model('facturacion_model');
+    $result = $this->facturacion_model->ajax_actualiza_digitos();
+    if($result[0])
+      $params['msg'] = $this->showMsgs(8);
+    echo json_encode($params);
+  }
+
+  private function imprimir_pdf(){
+    if(isset($_GET['id']{0}))
+    {
+      $this->load->model('facturacion_model');
+      $data = $this->facturacion_model->getDataFactura($_GET['id']);
+      if($data['uuid'] == ''){
+        $this->load->library('cfd');
+        $this->cfd->generarPDF($data,array('I'));
+      }else
+      $this->facturacion_model->generaFacturaPdf($_GET['id']);
+    }
+    else
+      redirect(base_url('panel/facturacion?'.String::getVarsLink(array('msg')).'&msg=1'));
+  }
+
+  private function imprimir_pdfm(){
+    if(isset($_GET['ffecha_ini']{0}) && isset($_GET['ffecha_fin']{0}))
+    {
+      $this->load->model('facturacion_model');
+      $data = $this->facturacion_model->getDataFactura(array(), true,
+        "Date(fecha) BETWEEN '".$_GET['ffecha_ini']."' AND '".$_GET['ffecha_fin']."'");
       $this->load->library('cfd');
-      $res = $this->db->query("SELECT Count(id_empresa) AS t
-        FROM empresas
-        WHERE id_empresa='".$_POST['id_empresa']."'
-        AND cer_caduca > Date(now())");
-      if ($res->row()->t == 0)
-        $e = 2;
+      $this->cfd->generarMasPDF($data);
     }
   }
-  echo $e;
-}
 
-private function ajax_get_total_tickets(){
-  $this->load->model('facturacion_model');
-  $params = $this->facturacion_model->ajax_get_total_tickets();
-  echo json_encode($params);
-}
-
-private function ajax_agrega_factura(){
-  $this->load->library('form_validation');
-
-  $rules = array(
-    array('field' => 'hcliente',
-      'label' => 'Cliente',
-      'rules' => 'required|max_length[25]'),
-    array('field' => 'dcliente',
-      'label' => 'Cliente',
-      'rules' => 'max_length[130]'),
-    array('field' => 'frfc',
-      'label' => 'RFC',
-      'rules' => 'max_length[13]'),
-    array('field' => 'fcalle',
-      'label' => 'Calle',
-      'rules' => 'max_length[60]'),
-    array('field' => 'fno_exterior',
-      'label' => 'No. Ext',
-      'rules' => 'max_length[7]'),
-    array('field' => 'fno_interior',
-      'label' => 'No. Int',
-      'rules' => 'max_length[7]'),
-    array('field'   => 'fcolonia',
-      'label'         => 'Colonia',
-      'rules'         => 'max_length[60]'),
-    array('field'   => 'flocalidad',
-      'label'         => 'Localidad',
-      'rules'         => 'max_length[45]'),
-    array('field'   => 'fmunicipio',
-      'label'         => 'Municipio',
-      'rules'         => 'max_length[45]'),
-    array('field'   => 'festado',
-      'label'         => 'Estado',
-      'rules'         => 'max_length[45]'),
-    array('field'   => 'fcp',
-      'label'         => 'CP',
-      'rules'         => 'max_length[10]'),
-    array('field'   => 'fpais',
-      'label'         => 'País',
-      'rules'         => 'max_length[60]'),
-    array('field'   => 'fplazo_credito',
-      'label'         => 'Plazo de Crédito',
-      'rules'         => 'required|is_natural'),
-    array('field'   => 'dfecha',
-      'label'         => 'Fecha',
-      'rules'         => 'required'),
-    array('field'   => 'dcondicion_pago',
-      'label'         => 'Condicion de Pago',
-      'rules'         => 'required'),
-    array('field'   => 'dleyendaserie',
-      'label'         => 'Leyenda-Serie',
-      'rules'         => 'required'),
-    array('field'   => 'dserie',
-      'label'         => 'Serie',
-      'rules'         => 'required|max_length[30]'),
-    array('field'   => 'dfolio',
-      'label'         => 'Folio',
-      'rules'         => 'required|is_natural'),
-    array('field'   => 'dano_aprobacion',
-      'label'         => 'Año de Aprobación',
-      'rules'         => 'required|max_length[4]|callback_isValidYear'),
-    array('field'   => 'dno_aprobacion',
-      'label'         => 'No. de Aprobación',
-      'rules'         => 'required|is_natural'),
-    array('field'   => 'dno_certificado',
-      'label'         => 'No. de Certificado',
-      'rules'         => 'required|max_length[100]'),
-    array('field'   => 'dtipo_comprobante',
-      'label'         => 'Tipo de Comprobante',
-      'rules'         => 'required|max_length[10]'),
-    array('field'   => 'dforma_pago',
-      'label'         => 'Forma de Pago',
-      'rules'         => 'required'),
-    array('field'   => 'dmetodo_pago',
-      'label'         => 'Metodo de Pago',
-      'rules'         => 'required'),
-    array('field'   => 'subtotal',
-      'label'         => 'Subtotal',
-      'rules'         => 'required'),
-    array('field'   => 'iva',
-      'label'         => 'Iva',
-      'rules'         => 'required'),
-    array('field'   => 'total_isr',
-      'label'         => 'ISR',
-      'rules'         => 'required'),
-    array('field'   => 'total',
-      'label'         => 'Total',
-      'rules'         => 'required'),
-    array('field'   => 'dttotal_letra',
-      'label'         => 'Importe con Letra',
-      'rules'         => 'max_length[250]'),
-    array('field'   => 'fobservaciones',
-      'label'         => 'Observaciones',
-      'rules'         => 'max_length[850]'),
-    array('field'   => 'tickets',
-      'label'         => 'Tickets',
-      'rules'         => 'required')
-  );
-
-  if(isset($_POST['dforma_pago']))
-    if($_POST['dforma_pago']==1)
-      $rules[] = array('field' => 'dforma_pago_parcialidad',
-        'label' => 'Formas de Pago',
-        'rules' => 'required|max_length[80]');
-
-    if(isset($_POST['dmetodo_pago']))
-      if($_POST['dmetodo_pago']!='efectivo' && $_POST['dmetodo_pago']!='')
-        $rules[] = array('field' => 'dmetodo_pago_digitos',
-          'label' => 'Ultimos 4 digitos',
-          'rules' => 'max_length[20]');
-
-      $this->form_validation->set_rules($rules);
-      if($this->form_validation->run() == FALSE)
-      {
-        $params['msg']  = $this->showMsgs(2,preg_replace("[\n|\r|\n\r]", '', validation_errors()));
-      }
-      else
-      {
-        $this->load->model('facturacion_model');
-        $params = $this->facturacion_model->addFactura();
-        if($params[0])
-          $params['msg'] = $this->showMsgs(4);
-        else{
-          $params['msg'] = $this->showMsgs(2, $params['resultado']['msg']);
-        }
-      }
-      echo json_encode($params);
-    }
-
-    private function ajax_actualiza_digitos(){
+  private function xml(){
+    if (isset($_GET['id']{0}))
+    {
       $this->load->model('facturacion_model');
-      $result = $this->facturacion_model->ajax_actualiza_digitos();
-      if($result[0])
-        $params['msg'] = $this->showMsgs(8);
-      echo json_encode($params);
+      $this->facturacion_model->descargarZip($_GET['id']);
     }
-
-    private function imprimir_pdf(){
-      if(isset($_GET['id']{0}))
-      {
-        $this->load->model('facturacion_model');
-        $data = $this->facturacion_model->getDataFactura($_GET['id']);
-        if($data['uuid'] == ''){
-          $this->load->library('cfd');
-          $this->cfd->generarPDF($data,array('I'));
-        }else
-        $this->facturacion_model->generaFacturaPdf($_GET['id']);
-      }
-      else
-        redirect(base_url('panel/facturacion?'.String::getVarsLink(array('msg')).'&msg=1'));
-    }
-
-    private function imprimir_pdfm(){
-      if(isset($_GET['ffecha_ini']{0}) && isset($_GET['ffecha_fin']{0}))
-      {
-        $this->load->model('facturacion_model');
-        $data = $this->facturacion_model->getDataFactura(array(), true,
-          "Date(fecha) BETWEEN '".$_GET['ffecha_ini']."' AND '".$_GET['ffecha_fin']."'");
-        $this->load->library('cfd');
-        $this->cfd->generarMasPDF($data);
-      }
-    }
-
-    private function xml(){
-      if (isset($_GET['id']{0}))
-      {
-        $this->load->model('facturacion_model');
-        $this->facturacion_model->descargarZip($_GET['id']);
-      }
-      else
-       redirect(base_url('panel/facturacion?'.String::getVarsLink(array('msg')).'&msg=1'));
-   }
+    else
+     redirect(base_url('panel/facturacion?'.String::getVarsLink(array('msg')).'&msg=1'));
+ }
 
   /**
   * Muestra la vista par el envio de los correo.
@@ -576,37 +579,36 @@ private function ajax_agrega_factura(){
     $this->load->model('clientes_model');
 
     if(isset($_GET['send'])){
-
       if (isset($_GET['id']{0}))
       {
-       $response = $this->facturacion_model->enviarEmail($_GET['id']);
-       $params['frm_errors'] = $this->showMsgs(13);
-     }
-     else redirect(base_url('panel/facturacion/?msg='));
-   }
+        $response = $this->facturacion_model->enviarEmail($_GET['id']);
+        $params['frm_errors'] = $this->showMsgs(13);
+      }
+      else redirect(base_url('panel/facturacion/?msg='));
+    }
 
-   $this->carabiner->js(array(
-    array('facturacion/email.js'),
-  ));
+    $this->carabiner->js(array(
+      array('facturacion/email.js'),
+    ));
 
-   $factura = $this->facturacion_model->getDataFactura($_GET['id']);
-   $cliente = $this->clientes_model->getInfoCliente($factura['id_cliente']);
+    $factura = $this->facturacion_model->getDataFactura($_GET['id']);
+    $cliente = $this->clientes_model->getInfoCliente($factura['id_cliente']);
 
-   $params['emails_default'] = $cliente['info']->email;
+    $params['emails_default'] = $cliente['info']->email;
 
-   $this->load->view('panel/facturacion/email',$params);
- }
+    $this->load->view('panel/facturacion/email',$params);
+  }
 
- private function index_series_folios(){
-  $this->carabiner->css(array(
-    array('general/forms.css','screen'),
-    array('general/tables.css','screen')
-  ));
+  private function index_series_folios(){
+    $this->carabiner->css(array(
+      array('general/forms.css','screen'),
+      array('general/tables.css','screen')
+    ));
 
-  $this->load->library('pagination');
-  $this->load->model('facturacion_model');
+    $this->load->library('pagination');
+    $this->load->model('facturacion_model');
 
-  $params['info_empleado']        = $this->info_empleado['info'];
+    $params['info_empleado']        = $this->info_empleado['info'];
     $params['opcmenu_active']       = 'Facturas'; //activa la opcion del menu
     $params['seo']                          = array('titulo' => 'Administrar Series y Folios');
 
@@ -736,22 +738,22 @@ private function ajax_agrega_factura(){
         if($_FILES['durl_img']['name']!='')
           $_POST['durl_img'] = 'ok';
 
-        $rules[] = array('field' => 'fserie',
-          'label' => 'Serie',
-          'rules' => 'max_lenght[30]|callback_isValidSerie[add]');
-        $rules[] = array('field' => 'durl_img',
-          'label' => 'Imagen',
-          'rules' => '');
-      }
-
-      if($tipo=='edit'){
-        $rules[] = array('field'        => 'fserie',
-          'label' => 'Serie',
-          'rules' => 'max_lenght[30]|callback_isValidSerie[edit]');
-      }
-
-      $this->form_validation->set_rules($rules);
+      $rules[] = array('field' => 'fserie',
+        'label' => 'Serie',
+        'rules' => 'max_lenght[30]|callback_isValidSerie[add]');
+      $rules[] = array('field' => 'durl_img',
+        'label' => 'Imagen',
+        'rules' => '');
     }
+
+    if($tipo=='edit'){
+      $rules[] = array('field'        => 'fserie',
+        'label' => 'Serie',
+        'rules' => 'max_lenght[30]|callback_isValidSerie[edit]');
+    }
+
+    $this->form_validation->set_rules($rules);
+  }
 
   /**
    * Form_validation: Valida su una fecha esta en formato correcto

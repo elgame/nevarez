@@ -380,48 +380,58 @@ class facturacion_model extends privilegios_model{
     }
 
 	public function addFactura(){
-// 		Carga la libreria de Facturacion
-		$this->load->library('cfd');
+    // Carga la libreria de Facturacion
+		// $this->load->library('cfd');
 		$this->load->library('cfdi');
 		$id_factura = BDUtil::getId(); // ID FACTURA
 
 		$fecha_xml 	= $this->getFechaXML($this->input->post('dfecha')); //str_replace(' ', 'T', $this->input->post('dfecha'));
-		$forma_pago	= ($_POST['dforma_pago']==1) ? $this->input->post('dforma_pago_parcialidad') : 'Pago en una sola exhibición';
+		// $forma_pago	= ($_POST['dforma_pago']==1) ? $this->input->post('dforma_pago_parcialidad') : 'Pago en una sola exhibición';
 
 		$no_cta_pago = '';
-		if($_POST['dmetodo_pago']!='efectivo')
-			if($_POST['dmetodo_pago_digitos']!='' || $_POST['dmetodo_pago_digitos']=='No identificado')
-				$no_cta_pago =  $this->input->post('dmetodo_pago_digitos');
+    $tipoDeComprobante = 'I';
+    if ($this->input->post('dtipo_comprobante')=='egreso')
+      $tipoDeComprobante = 'E';
+    elseif ($this->input->post('dserie')=='T')
+      $tipoDeComprobante = 'T';
+		// if($_POST['dmetodo_pago']!='efectivo')
+		// 	if($_POST['dmetodo_pago_digitos']!='' || $_POST['dmetodo_pago_digitos']=='No identificado')
+		// 		$no_cta_pago =  $this->input->post('dmetodo_pago_digitos');
 
-		// Parametros para construir la cadena original
-		$cad_data = array(
-					'serie'			=> $this->input->post('dserie'),
-					'folio'			=> $this->input->post('dfolio'),
-					'fecha_xml'		=> $fecha_xml,
-					'no_aprobacion'	=> $this->input->post('dno_aprobacion'),
-					'ano_aprobacion'=> $this->input->post('dano_aprobacion'),
-					'tipo_comprobante'	=> $this->input->post('dtipo_comprobante'),
-					'forma_pago'		=> $forma_pago,
-					'subtotal'			=> $this->input->post('subtotal'),
-					'total'				=> $this->input->post('total'),
-					'metodo_pago'		=> $this->input->post('dmetodo_pago'),
-					'no_cuenta_pago'	=> $no_cta_pago,
-					'moneda'			=> 'pesos',
+    $cfdi_ext = [
+      'tipoDeComprobante' => $tipoDeComprobante,
+      'usoCfdi'           => $this->input->post('duso_cfdi'),
+    ];
 
-					'crfc'			=> $this->input->post('frfc'),
-					'cnombre'		=> $this->input->post('dcliente'),
-					'ccalle'		=> $this->input->post('fcalle'),
-					'cno_exterior'	=> $this->input->post('fno_exterior'),
-					'cno_interior'	=> $this->input->post('fno_interior'),
-					'ccolonia'		=> $this->input->post('fcolonia'),
-					'clocalidad'	=> $this->input->post('flocalidad'),
-					'cmunicipio'	=> $this->input->post('fmunicipio'),
-					'cestado'		=> $this->input->post('festado'),
-					'cpais'			=> $this->input->post('fpais'),
-					'ccp'			=> $this->input->post('fcp')
-				);
-		if(floatval($_POST['total_isr'])>0)
-			$cad_data['total_isr'] = $this->input->post('total_isr');
+		// // Parametros para construir la cadena original
+		// $cad_data = array(
+		// 			'serie'			=> $this->input->post('dserie'),
+		// 			'folio'			=> $this->input->post('dfolio'),
+		// 			'fecha_xml'		=> $fecha_xml,
+		// 			'no_aprobacion'	=> $this->input->post('dno_aprobacion'),
+		// 			'ano_aprobacion'=> $this->input->post('dano_aprobacion'),
+		// 			'tipo_comprobante'	=> $this->input->post('dtipo_comprobante'),
+		// 			'forma_pago'		=> $this->input->post('dforma_pago'),
+		// 			'subtotal'			=> $this->input->post('subtotal'),
+		// 			'total'				=> $this->input->post('total'),
+		// 			'metodo_pago'		=> $this->input->post('dmetodo_pago'),
+		// 			'no_cuenta_pago'	=> $no_cta_pago,
+		// 			'moneda'			=> 'pesos',
+
+		// 			'crfc'			=> $this->input->post('frfc'),
+		// 			'cnombre'		=> $this->input->post('dcliente'),
+		// 			'ccalle'		=> $this->input->post('fcalle'),
+		// 			'cno_exterior'	=> $this->input->post('fno_exterior'),
+		// 			'cno_interior'	=> $this->input->post('fno_interior'),
+		// 			'ccolonia'		=> $this->input->post('fcolonia'),
+		// 			'clocalidad'	=> $this->input->post('flocalidad'),
+		// 			'cmunicipio'	=> $this->input->post('fmunicipio'),
+		// 			'cestado'		=> $this->input->post('festado'),
+		// 			'cpais'			=> $this->input->post('fpais'),
+		// 			'ccp'			=> $this->input->post('fcp')
+		// 		);
+		// if(floatval($_POST['total_isr'])>0)
+		// 	$cad_data['total_isr'] = $this->input->post('total_isr');
 
 		$productos = array();
 		$data_t = array();
@@ -441,10 +451,12 @@ class facturacion_model extends privilegios_model{
 				);
 
 				$res_q1= $this->db->query("
-							SELECT tvp.id_ticket, tvp.id_ticket_producto, tvp.cantidad, tvp.unidad, tvp.descripcion, tvp.precio_unitario, tvp.importe
+							SELECT tvp.id_ticket, tvp.id_ticket_producto, tvp.cantidad, tvp.unidad, tvp.descripcion, tvp.precio_unitario, tvp.importe,
+                tvp.taza_iva, tvp.importe_iva
 							FROM tickets_vuelos_productos as tvp
 							WHERE tvp.id_ticket='{$ticket['id_ticket']}'
-							GROUP BY tvp.id_ticket, tvp.id_ticket_producto, tvp.cantidad, tvp.unidad, tvp.descripcion, tvp.precio_unitario, tvp.importe
+							GROUP BY tvp.id_ticket, tvp.id_ticket_producto, tvp.cantidad, tvp.unidad, tvp.descripcion, tvp.precio_unitario, tvp.importe,
+                tvp.taza_iva, tvp.importe_iva
 						");
 
 				$res_q2 = $this->db->query("SELECT
@@ -456,7 +468,23 @@ class facturacion_model extends privilegios_model{
 
 				if($res_q1->num_rows>0)
 					foreach ($res_q1->result() as $prod)
-						$productos[] = array('cantidad'=>$prod->cantidad,'unidad'=>$prod->unidad,'descripcion'=>$prod->descripcion,'valorUnitario'=>$prod->precio_unitario,'importe'=>$prod->importe);
+						$productos[] = array(
+              'cantidad'      => $prod->cantidad,
+              'unidad'        => $prod->unidad,
+              'claveUnidad'   => [
+                'key'   => 'E48',
+                'value' => 'Unidad de servicio',
+              ],
+              'claveProducto' => [
+                'key'   => '70141601',
+                'value' => 'Servicios de fumigación de cultivos',
+              ],
+              'descripcion'   => $prod->descripcion,
+              'valorUnitario' => $prod->precio_unitario,
+              'importe'       => $prod->importe,
+              'tazaIva'       => $prod->taza_iva,
+              'importeIva'    => $prod->importe_iva,
+            );
 
 				if($res_q2->num_rows>0)
 					foreach ($res_q2->result() as $iva){
@@ -468,58 +496,59 @@ class facturacion_model extends privilegios_model{
 			}
 		}
 
-		if($iva_16>0)
-			$cad_data['ivas'][] = array('tasa_iva'=>'16','importe_iva'=>$iva_16);
-		if($iva_10>0)
-			$cad_data['ivas'][] = array('tasa_iva'=>'10','importe_iva'=>$iva_10);
-		if($tot_prod_iva_0>0)
-			$cad_data['ivas'][] = array('tasa_iva'=>'0','importe_iva'=>$iva_0);
+		// if($iva_16>0)
+		// 	$cad_data['ivas'][] = array('tasa_iva'=>'16','importe_iva'=>$iva_16);
+		// if($iva_10>0)
+		// 	$cad_data['ivas'][] = array('tasa_iva'=>'10','importe_iva'=>$iva_10);
+		// if($tot_prod_iva_0>0)
+		// 	$cad_data['ivas'][] = array('tasa_iva'=>'0','importe_iva'=>$iva_0);
 
-		if(count($cad_data['ivas']) == 0)
-			$cad_data['ivas'][] = array('tasa_iva'=>'0','importe_iva'=>'0');
+		// if(count($cad_data['ivas']) == 0)
+		// 	$cad_data['ivas'][] = array('tasa_iva'=>'0','importe_iva'=>'0');
 
-		$cad_data['iva_total'] = $iva_16 + $iva_10 + $iva_0;
-		$cad_data['productos'] = $productos;
-		$cadena_original = $this->cfd->obtenCadenaOriginal($cad_data); // OBTIENE CADENA ORIGINAL
-		$sello 	= $this->cfd->obtenSello($cadena_original); // OBTIENE EL SELLO DIGITAL
+		// $cad_data['iva_total'] = $iva_16 + $iva_10 + $iva_0;
+		// $cad_data['productos'] = $productos;
 
-// 		Datos de la factura a insertar
+		// $cadena_original = $this->cfd->obtenCadenaOriginal($cad_data); // OBTIENE CADENA ORIGINAL
+		// $sello 	= $this->cfd->obtenSello($cadena_original); // OBTIENE EL SELLO DIGITAL
+
+    // Datos de la factura a insertar
 		$data = array(
-				'id_factura'	=> $id_factura,
-				'id_cliente'	=> $this->input->post('hcliente'),
-				'id_empleado'	=> $_SESSION['id_empleado'],
-				'id_empresa'          => $this->input->post('didempresa'),
-				'serie'			=> $this->input->post('dserie'),
-				'folio'			=> $this->input->post('dfolio'),
-				'no_aprobacion'	=> $this->input->post('dno_aprobacion'),
-				'ano_aprobacion'=> $this->input->post('dano_aprobacion'),
-				'fecha'			=> $this->input->post('dfecha'),
-				'importe_iva'	=> $this->input->post('iva'),
-				'subtotal'		=> $this->input->post('subtotal'),
-				'total'			=> $this->input->post('total'),
-				'total_letra'	=> $this->input->post('dtotal_letra'),
-				'tipo_comprobante'	=> $this->input->post('dtipo_comprobante'),
-				'sello'				=> $sello,
-				'cadena_original'	=> $cadena_original,
-				'no_certificado'	=> $this->input->post('dno_certificado'),
-				'version'			=> $this->cfdi->version,
-				'fecha_xml'			=> $fecha_xml,
-				'metodo_pago'		=> $this->input->post('dmetodo_pago'),
-				'condicion_pago'	=> ($_POST['dcondicion_pago']=='credito') ? 'cr' : 'co',
-				'plazo_credito'		=> $this->input->post('fplazo_credito'),
-				'nombre'		=> $this->input->post('dcliente'),
-				'rfc'			=> $this->input->post('frfc'),
-				'calle'			=> $this->input->post('fcalle'),
-				'no_exterior'	=> $this->input->post('fno_exterior'),
-				'no_interior'	=> $this->input->post('fno_interior'),
-				'colonia'		=> $this->input->post('fcolonia'),
-				'localidad'		=> $this->input->post('flocalidad'),
-				'municipio'		=> $this->input->post('fmunicipio'),
-				'estado'		=> $this->input->post('festado'),
-				'cp'			=> $this->input->post('fcp'),
-				'pais'			=> $this->input->post('fpais'),
-				'total_isr'		=> $this->input->post('total_isr'),
-				'observaciones'	=> $this->input->post('fobservaciones')
+      'id_factura'       => $id_factura,
+      'id_cliente'       => $this->input->post('hcliente'),
+      'id_empleado'      => $_SESSION['id_empleado'],
+      'id_empresa'       => $this->input->post('didempresa'),
+      'serie'            => $this->input->post('dserie'),
+      'folio'            => $this->input->post('dfolio'),
+      'no_aprobacion'    => $this->input->post('dno_aprobacion'),
+      'ano_aprobacion'   => $this->input->post('dano_aprobacion'),
+      'fecha'            => $this->input->post('dfecha'),
+      'importe_iva'      => $this->input->post('iva'),
+      'subtotal'         => $this->input->post('subtotal'),
+      'total'            => $this->input->post('total'),
+      'total_letra'      => $this->input->post('dtotal_letra'),
+      'tipo_comprobante' => $this->input->post('dtipo_comprobante'),
+      'sello'            => '', // $sello,
+      'cadena_original'  => '', // $cadena_original,
+      'no_certificado'   => $this->input->post('dno_certificado'),
+      'version'          => $this->cfdi->version,
+      'fecha_xml'        => $fecha_xml,
+      'metodo_pago'      => $this->input->post('dmetodo_pago'),
+      'condicion_pago'   => ($_POST['dcondicion_pago']=='credito') ? 'cr' : 'co',
+      'plazo_credito'    => $this->input->post('fplazo_credito'),
+      'nombre'           => $this->input->post('dcliente'),
+      'rfc'              => $this->input->post('frfc'),
+      'calle'            => $this->input->post('fcalle'),
+      'no_exterior'      => $this->input->post('fno_exterior'),
+      'no_interior'      => $this->input->post('fno_interior'),
+      'colonia'          => $this->input->post('fcolonia'),
+      'localidad'        => $this->input->post('flocalidad'),
+      'municipio'        => $this->input->post('fmunicipio'),
+      'estado'           => $this->input->post('festado'),
+      'cp'               => $this->input->post('fcp'),
+      'pais'             => $this->input->post('fpais'),
+      'total_isr'        => $this->input->post('total_isr'),
+      'observaciones'    => $this->input->post('fobservaciones')
 		);
 
 		if($_POST['dforma_pago']==1)
@@ -543,134 +572,141 @@ class facturacion_model extends privilegios_model{
 			$res = $this->abonar_factura(false,$id_factura,null,"");
 		}
 
-		$data_f = $this->getDataFactura($id_factura,true);
-		$this->cfd->generaArchivos($data_f);
+		// $data_f = $this->getDataFactura($id_factura,true);
+		// $this->cfd->generaArchivos($data_f);
 
 		/*ESTO ES LO NUEVO QUE AGREGUÉ*/
 
-			// Obtiene los datos para la cadena original
-			$datosCadOrig = $this->datosCadenaOriginal();
+			// // Obtiene los datos para la cadena original
+			// $datosCadOrig = $this->datosCadenaOriginal();
 
-			$datosCadOrig['sinCosto']   =  isset($_POST['dsincosto']) ? true : false;
+			// $datosCadOrig['sinCosto']   =  isset($_POST['dsincosto']) ? true : false;
 
-			// Asignamos los productos o conceptos a los datos de la cadena original.
-        	$datosCadOrig['concepto']  = $cad_data['productos'];
+			// // Asignamos los productos o conceptos a los datos de la cadena original.
+      // $datosCadOrig['concepto']  = $cad_data['productos'];
 
-			// Asignamos las retenciones a los datos de la cadena original.
-			 $impuestosRetencion = array(
-			  'impuesto' => 'IVA',
-			  'importe'  => $this->input->post('total_retiva'),
-			);
+			// // Asignamos las retenciones a los datos de la cadena original.
+			//  $impuestosRetencion = array(
+			//   'impuesto' => 'IVA',
+			//   'importe'  => $this->input->post('total_retiva'),
+			// );
 
-			$datosCadOrig['retencion'][] = $impuestosRetencion;
-			$datosCadOrig['totalImpuestosRetenidos'] = $this->input->post('total_retiva');
+			// $datosCadOrig['retencion'][] = $impuestosRetencion;
+			// $datosCadOrig['totalImpuestosRetenidos'] = $this->input->post('total_retiva');
 
-			$impuestosTraslados = array();
+			// $impuestosTraslados = array();
 
-			// Si hay conceptos con traslado 11% lo agrega.
-			if ($iva_10 > 0)
-			{
-			  $impuestosTraslados[] = array(
-				'Impuesto' => 'IVA',
-				'tasa'     => '10',
-				'importe'  => $iva_10,
-			  );
-			}
+			// // Si hay conceptos con traslado 11% lo agrega.
+			// if ($iva_10 > 0)
+			// {
+			//   $impuestosTraslados[] = array(
+			// 	'Impuesto' => 'IVA',
+			// 	'tasa'     => '10',
+			// 	'importe'  => $iva_10,
+			//   );
+			// }
 
-			// Si hay conceptos con traslado 16% lo agrega.
-			if ($iva_16 > 0)
-			{
-			  $impuestosTraslados[] = array(
-				'Impuesto' => 'IVA',
-				'tasa'     => '16',
-				'importe'  => $iva_16,
-			  );
-			}
+			// // Si hay conceptos con traslado 16% lo agrega.
+			// if ($iva_16 > 0)
+			// {
+			//   $impuestosTraslados[] = array(
+			// 	'Impuesto' => 'IVA',
+			// 	'tasa'     => '16',
+			// 	'importe'  => $iva_16,
+			//   );
+			// }
 
-			// Si hay conceptos con traslado 0% lo agrega.
-			if($tot_prod_iva_0>0 || count($impuestosTraslados) == 0)
-			{
-				$impuestosTraslados[] = array(
-					'Impuesto' => 'IVA',
-					'tasa'     => '0',
-					'importe'  => '0',
-				);
-			}
+			// // Si hay conceptos con traslado 0% lo agrega.
+			// if($tot_prod_iva_0>0 || count($impuestosTraslados) == 0)
+			// {
+			// 	$impuestosTraslados[] = array(
+			// 		'Impuesto' => 'IVA',
+			// 		'tasa'     => '0',
+			// 		'importe'  => '0',
+			// 	);
+			// }
 
-			// Asigna los impuestos traslados.
-			$datosCadOrig['traslado']  = $impuestosTraslados;
-			$datosCadOrig['totalImpuestosTrasladados'] = $this->input->post('total_iva');
 
-			$cadenaOriginal = $this->cfdi->obtenCadenaOriginal($datosCadOrig);
-			$sello          = $this->cfdi->obtenSello($cadenaOriginal['cadenaOriginal']);
+    // xml 3.3
+    $datosApi = $this->cfdi->obtenDatosCfdi33($_POST, $productos);
 
-			// Obtiene el contentido del certificado.
-			$certificado = $this->cfdi->obtenCertificado($this->db
-			  ->select('cer')
-			  ->from("empresas")
-			  ->where("id_empresa", $_POST['didempresa'])
-			  ->get()->row()->cer
-			);
+			// // Asigna los impuestos traslados.
+			// $datosCadOrig['traslado']  = $impuestosTraslados;
+			// $datosCadOrig['totalImpuestosTrasladados'] = $this->input->post('total_iva');
 
-			//var_dump($certificado);
+			// $cadenaOriginal = $this->cfdi->obtenCadenaOriginal($datosCadOrig);
+			// $sello          = $this->cfdi->obtenSello($cadenaOriginal['cadenaOriginal']);
 
-			$dataCliente = array(
-			  'id_factura'  => $id_factura,
-			  'nombre'      => $datosCadOrig['nombre'],
-			  'rfc'         => $datosCadOrig['rfc'],
-			  'calle'       => $datosCadOrig['calle'],
-			  'no_exterior' => $datosCadOrig['noExterior'],
-			  'no_interior' => $datosCadOrig['noInterior'],
-			  'colonia'     => $datosCadOrig['colonia'],
-			  'localidad'   => $datosCadOrig['localidad'],
-			  'municipio'   => $datosCadOrig['municipio'],
-			  'estado'      => $datosCadOrig['estado'],
-			  'cp'          => $datosCadOrig['codigoPostal'],
-			  'pais'        => $datosCadOrig['pais'],
-			);
+			// // Obtiene el contentido del certificado.
+			// $certificado = $this->cfdi->obtenCertificado($this->db
+			//   ->select('cer')
+			//   ->from("empresas")
+			//   ->where("id_empresa", $_POST['didempresa'])
+			//   ->get()->row()->cer
+			// );
 
-			// Datos que actualizara de la factura
-			$updateFactura = array(
-			  'cadena_original' => $cadenaOriginal['cadenaOriginal'],
-			  'sello'           => $sello,
-			  'certificado'     => $certificado
-			);
-			$this->db->update('facturacion', $updateFactura, array('id_factura' => $id_factura));
+			// //var_dump($certificado);
 
-			// Datos para el XML3.2
-			$datosXML               = $cadenaOriginal['datos'];
-			$datosXML['id']         = $this->input->post('didempresa');
-			$datosXML['sinCosto']   =  isset($_POST['dsincosto']) ? true : false;
-			$datosXML['table']      = 'empresas';
-			$datosXML['comprobante']['fecha']         = $fecha_xml;
-			$datosXML['comprobante']['serie']         = $this->input->post('dserie');
-			$datosXML['comprobante']['folio']         = $this->input->post('dfolio');
-			$datosXML['comprobante']['sello']         = $sello;
-			$datosXML['comprobante']['noCertificado'] = $this->input->post('dno_certificado');
-			$datosXML['comprobante']['certificado']   = $certificado;
-			$datosXML['concepto']                     = $cad_data['productos'];
+			// $dataCliente = array(
+			//   'id_factura'  => $id_factura,
+			//   'nombre'      => $datosCadOrig['nombre'],
+			//   'rfc'         => $datosCadOrig['rfc'],
+			//   'calle'       => $datosCadOrig['calle'],
+			//   'no_exterior' => $datosCadOrig['noExterior'],
+			//   'no_interior' => $datosCadOrig['noInterior'],
+			//   'colonia'     => $datosCadOrig['colonia'],
+			//   'localidad'   => $datosCadOrig['localidad'],
+			//   'municipio'   => $datosCadOrig['municipio'],
+			//   'estado'      => $datosCadOrig['estado'],
+			//   'cp'          => $datosCadOrig['codigoPostal'],
+			//   'pais'        => $datosCadOrig['pais'],
+			// );
 
-			$datosXML['domicilio']['calle']        = $dataCliente['calle'];
-			$datosXML['domicilio']['noExterior']   = $dataCliente['no_exterior'];
-			$datosXML['domicilio']['noInterior']   = $dataCliente['no_interior'];
-			$datosXML['domicilio']['colonia']      = $dataCliente['colonia'];
-			$datosXML['domicilio']['localidad']    = $dataCliente['localidad'];
-			$datosXML['domicilio']['municipio']    = $dataCliente['municipio'];
-			$datosXML['domicilio']['estado']       = $dataCliente['estado'];
-			$datosXML['domicilio']['pais']         = $dataCliente['pais'];
-			$datosXML['domicilio']['codigoPostal'] = $dataCliente['cp'];
+			// // Datos que actualizara de la factura
+			// $updateFactura = array(
+			//   'cadena_original' => $cadenaOriginal['cadenaOriginal'],
+			//   'sello'           => $sello,
+			//   'certificado'     => $certificado
+			// );
+			// $this->db->update('facturacion', $updateFactura, array('id_factura' => $id_factura));
 
-			$datosXML['totalImpuestosRetenidos']   = $this->input->post('total_retiva');
-			$datosXML['totalImpuestosTrasladados'] = $this->input->post('total_iva');
+			// // Datos para el XML3.2
+			// $datosXML               = $cadenaOriginal['datos'];
+			// $datosXML['id']         = $this->input->post('didempresa');
+			// $datosXML['sinCosto']   =  isset($_POST['dsincosto']) ? true : false;
+			// $datosXML['table']      = 'empresas';
+			// $datosXML['comprobante']['fecha']         = $fecha_xml;
+			// $datosXML['comprobante']['serie']         = $this->input->post('dserie');
+			// $datosXML['comprobante']['folio']         = $this->input->post('dfolio');
+			// $datosXML['comprobante']['sello']         = $sello;
+			// $datosXML['comprobante']['noCertificado'] = $this->input->post('dno_certificado');
+			// $datosXML['comprobante']['certificado']   = $certificado;
+			// $datosXML['concepto']                     = $cad_data['productos'];
 
-			$datosXML['retencion'] = $impuestosRetencion;
-			$datosXML['traslado']  = $impuestosTraslados;
+			// $datosXML['domicilio']['calle']        = $dataCliente['calle'];
+			// $datosXML['domicilio']['noExterior']   = $dataCliente['no_exterior'];
+			// $datosXML['domicilio']['noInterior']   = $dataCliente['no_interior'];
+			// $datosXML['domicilio']['colonia']      = $dataCliente['colonia'];
+			// $datosXML['domicilio']['localidad']    = $dataCliente['localidad'];
+			// $datosXML['domicilio']['municipio']    = $dataCliente['municipio'];
+			// $datosXML['domicilio']['estado']       = $dataCliente['estado'];
+			// $datosXML['domicilio']['pais']         = $dataCliente['pais'];
+			// $datosXML['domicilio']['codigoPostal'] = $dataCliente['cp'];
 
-			// Genera el archivo XML y lo guarda en disco.
-			$archivos = $this->cfdi->generaArchivos($datosXML);
+			// $datosXML['totalImpuestosRetenidos']   = $this->input->post('total_retiva');
+			// $datosXML['totalImpuestosTrasladados'] = $this->input->post('total_iva');
+
+			// $datosXML['retencion'] = $impuestosRetencion;
+			// $datosXML['traslado']  = $impuestosTraslados;
+
+			// // Genera el archivo XML y lo guarda en disco.
+			// $archivos = $this->cfdi->generaArchivos($datosXML);
 
 			// Timbrado de la factura.
-        	$result = $this->timbrar($archivos['pathXML'], $id_factura);
+      $result = $this->timbrar($datosApi, $id_factura);
+      echo "<pre>";
+        var_dump($result);
+      echo "</pre>";exit;
 
 			if ($result['passes'])
 			{
@@ -699,80 +735,83 @@ class facturacion_model extends privilegios_model{
     * @param  boolean $delFiles
     * @return void
     */
-    private function timbrar($pathXML, $idFactura, $delFiles = true)
+    private function timbrar($dataXml, $idFactura, $delFiles = true)
     {
-        $this->load->library('facturartebarato_api');
+      $this->load->library('facturartebarato_api');
 
-        $this->facturartebarato_api->setPathXML($pathXML);
+      // $this->facturartebarato_api->setPathXML($dataXml);
 
-        // Realiza el timbrado usando la libreria.
-        $timbrado = $this->facturartebarato_api->timbrar();
+      // Realiza el timbrado usando la libreria.
+      $timbrado = $this->facturartebarato_api->timbrar($dataXml);
 
-        // echo "<pre>";
-        //   var_dump($timbrado);
-        // echo "</pre>";exit;
+      // echo "<pre>";
+      //   var_dump($timbrado);
+      // echo "</pre>";exit;
 
-        $result = array(
-          'id_factura' => $idFactura,
-          'codigo'     => $timbrado->codigo
-        );
+      $result = array(
+        'id_factura' => $idFactura,
+        'codigo'     => $timbrado->codigo
+      );
 
-        // Si no hubo errores al momento de realizar el timbrado.
-        if ($timbrado->status)
+      // Si no hubo errores al momento de realizar el timbrado.
+      if ($timbrado->status)
+      {
+        // Si el codigo es 501:Autenticación no válida o 708:No se pudo conectar al SAT,
+        // significa que el timbrado esta pendiente.
+        if ($timbrado->codigo === '501' || $timbrado->codigo === '708')
         {
-          // Si el codigo es 501:Autenticación no válida o 708:No se pudo conectar al SAT,
-          // significa que el timbrado esta pendiente.
-          if ($timbrado->codigo === '501' || $timbrado->codigo === '708')
-          {
-            // Se coloca el status de timbre de la factura como pendiente.
-            $statusTimbrado = 'p';
-          }
-          else
-          {
-            // Si el timbrado se realizo correctamente.
-
-            // Se coloca el status de timbre de la factura como timbrado.
-            $statusTimbrado = 't';
-          }
-
-          // Actualiza los datos en la BDD.
-          $dataTimbrado = array(
-            'xml'             => $this->facturartebarato_api->getXML(),
-            'status_timbrado' => $statusTimbrado,
-            'uuid'            => $this->facturartebarato_api->getUUID(),
-          );
-
-          $this->db->update('facturacion', $dataTimbrado, array('id_factura' => $idFactura));
-          log_message('error', var_export($dataTimbrado, true));
-
-          $result['passes'] = true;
+          // Se coloca el status de timbre de la factura como pendiente.
+          $statusTimbrado = 'p';
         }
         else
         {
-        	log_message('error', var_export($timbrado, true));
-          // Si es true $delFile entonces elimina todo lo relacionado con la factura.
-          if ($delFiles)
-          {
-            $this->db->delete('facturacion', array('id_factura' => $idFactura));
-            unlink($pathXML);
-          }
+          // Si el timbrado se realizo correctamente.
 
-          // Entra si hubo un algun tipo de error de conexion a internet.
-          if ($timbrado->codigo === 'ERR_INTERNET_DISCONNECTED')
-            $result['msg'] = 'Error Timbrado: Internet Desconectado. Verifique su conexión para realizar el timbrado.';
-          elseif ($timbrado->codigo === '500')
-            $result['msg'] = 'Error en el servidor del timbrado. Pongase en contacto con el equipo de desarrollo del sistema.';
-          else
-            $result['msg'] = $timbrado->mensaje;
-
-          $result['passes'] = false;
+          // Se coloca el status de timbre de la factura como timbrado.
+          $statusTimbrado = 't';
         }
 
-         //echo "<pre>";
-//           var_dump($timbrado);
-//         echo "</pre>";exit;
+        // Actualiza los datos en la BDD.
+        $dataTimbrado = array(
+          'xml'             => $timbrado->data->xml,
+          'status_timbrado' => $statusTimbrado,
+          'uuid'            => $timbrado->data->uuid,
+          'cadena_original' => $timbrado->data->cadenaOriginal,
+          'sello'           => $timbrado->data->sello,
+          'certificado'     => $dataXml['emisor']['cer'],
+          'cfdi_ext'        => json_encode($dataXml),
+        );
+        $this->db->update('facturacion', $dataTimbrado, array('id_factura' => $idFactura));
+        log_message('error', var_export($dataTimbrado, true));
 
-        return $result;
+        $result['passes'] = true;
+      }
+      else
+      {
+      	log_message('error', var_export($timbrado, true));
+        // Si es true $delFile entonces elimina todo lo relacionado con la factura.
+        if ($delFiles)
+        {
+          $this->db->delete('facturacion', array('id_factura' => $idFactura));
+          // unlink($pathXML);
+        }
+
+        // Entra si hubo un algun tipo de error de conexion a internet.
+        if ($timbrado->codigo === 'ERR_INTERNET_DISCONNECTED')
+          $result['msg'] = 'Error Timbrado: Internet Desconectado. Verifique su conexión para realizar el timbrado.';
+        elseif ($timbrado->codigo === '500')
+          $result['msg'] = 'Error en el servidor del timbrado. Pongase en contacto con el equipo de desarrollo del sistema.';
+        else
+          $result['msg'] = $timbrado->mensaje;
+
+        $result['passes'] = false;
+      }
+
+       //echo "<pre>";
+      // var_dump($timbrado);
+      // echo "</pre>";exit;
+
+      return $result;
     }
 
 
