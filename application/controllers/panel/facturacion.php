@@ -541,7 +541,7 @@ class facturacion extends MY_Controller {
         $this->load->library('cfd');
         $this->cfd->generarPDF($data,array('I'));
       }else
-      $this->facturacion_model->generaFacturaPdf($_GET['id']);
+        $this->facturacion_model->generaFacturaPdf($_GET['id']);
     }
     else
       redirect(base_url('panel/facturacion?'.String::getVarsLink(array('msg')).'&msg=1'));

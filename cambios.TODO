@@ -1,4 +1,11 @@
 
+  ☐ cfdi 3.3
+    Crear el schema otros y cargar el archivo catalogos33
+    UPDATE public.empresas SET cfdi_version='3.3';
+    ALTER TABLE public.facturacion ADD COLUMN cfdi_ext json;
+    ALTER TABLE public.facturacion ALTER COLUMN sello TYPE character varying(400);
+
+
 Remplazar los archivos modificados, los que estan abiertos
 Ejecutar http://localhost/nevarez/panel/facturacion/parchefac para las facturas 1 y 2
 Cambiar en facturacion/parchefac a regeneraFacturas2() y en facturacion_model identificar el rango de folios y los dias en facturacion

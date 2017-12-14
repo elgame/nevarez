@@ -594,7 +594,7 @@ class cfdi{
       ),
       'serie'             => $data['dserie'],
       'folio'             => $data['dfolio'],
-      'fecha'             => $data['dfecha'],
+      'fecha'             => $data['fecha_xml'],
       'formaDePago'       => $data['dforma_pago'],
       'condicionesDePago' => $data['dcondicion_pago'] == 'credito'? 'CREDITO': 'CONTADO',
       'moneda'            => 'MXN',
