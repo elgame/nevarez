@@ -78,13 +78,13 @@ $(function(){
         else $('#show_parcialidad').css({'display':'none'});
     });
 
-    $('#dmetodo_pago').on('change',function(){
-        if($(this).val()!='efectivo' && $(this).val()!=''){
-                $('#show_pago_digitos').css({'display':'block'});
-                $('#dmetodo_pago_digitos').val('No identificado').focus();
-        }
-        else $('#show_pago_digitos').css({'display':'none'});
-    });
+    // $('#dmetodo_pago').on('change',function(){
+    //     if($(this).val()!='efectivo' && $(this).val()!=''){
+    //             $('#show_pago_digitos').css({'display':'block'});
+    //             $('#dmetodo_pago_digitos').val('No identificado').focus();
+    //     }
+    //     else $('#show_pago_digitos').css({'display':'none'});
+    // });
 
     $('#submit').on('click',function(){ajax_submit_form();});
 });
@@ -273,6 +273,7 @@ function ajax_submit_form(){
             post.dforma_pago_parcialidad = $('#dforma_pago_parcialidad').val();
             post.dmetodo_pago = $('#dmetodo_pago').val();
             post.dmetodo_pago_digitos = $('#dmetodo_pago_digitos').val();
+            post.duso_cfdi = $('#duso_cfdi').val();
 
             post.subtotal = parseFloat(subtotal,2);
             post.iva = parseFloat(iva,2);
