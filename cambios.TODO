@@ -1,5 +1,9 @@
 
-  ☐ cfdi 3.3
+ ☐ Complemento de pago
+    ALTER TABLE public.facturacion_series_folios ADD COLUMN tipo character varying(10) NOT NULL DEFAULT 'f'::character varying;
+    COMMENT ON COLUMN public.facturacion_series_folios.tipo IS 'f: factura, cp: complemento de pago';
+
+  ✔ cfdi 3.3 @done (18-06-15 16:31)
     Crear el schema otros y cargar el archivo catalogos33
     UPDATE public.empresas SET cfdi_version='3.3';
     ALTER TABLE public.facturacion ADD COLUMN cfdi_ext json;

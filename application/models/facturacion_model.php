@@ -1176,13 +1176,14 @@ class facturacion_model extends privilegios_model{
     $id_serie_folio = BDUtil::getId();
     $data = array(
         'id_serie_folio' => $id_serie_folio,
-        'id_empresa'  => $this->input->post('fidempresa'),
-        'serie' => strtoupper($this->input->post('fserie')),
-        'no_aprobacion' => $this->input->post('fno_aprobacion'),
-        'folio_inicio'  => $this->input->post('ffolio_inicio'),
-        'folio_fin'   => $this->input->post('ffolio_fin'),
-        'ano_aprobacion'=> $this->input->post('fano_aprobacion'),
-        'imagen' => $path_img,
+        'id_empresa'     => $this->input->post('fidempresa'),
+        'serie'          => strtoupper($this->input->post('fserie')),
+        'no_aprobacion'  => $this->input->post('fno_aprobacion'),
+        'folio_inicio'   => $this->input->post('ffolio_inicio'),
+        'folio_fin'      => $this->input->post('ffolio_fin'),
+        'ano_aprobacion' => $this->input->post('fano_aprobacion'),
+        'tipo'           => $this->input->post('ftipo'),
+        'imagen'         => $path_img,
     );
 
     if($this->input->post('fleyenda')!='')
@@ -1202,12 +1203,13 @@ class facturacion_model extends privilegios_model{
     $id_serie_folio = ($id_serie_folio != '') ? $id_serie_folio : $this->input->get('id');
 
     $data = array(
-        'id_empresa'  => $this->input->post('fidempresa'),
-        'serie' => strtoupper($this->input->post('fserie')),
-        'no_aprobacion' => $this->input->post('fno_aprobacion'),
-        'folio_inicio'  => $this->input->post('ffolio_inicio'),
-        'folio_fin'   => $this->input->post('ffolio_fin'),
-        'ano_aprobacion'=> $this->input->post('fano_aprobacion')
+        'id_empresa'     => $this->input->post('fidempresa'),
+        'serie'          => strtoupper($this->input->post('fserie')),
+        'no_aprobacion'  => $this->input->post('fno_aprobacion'),
+        'folio_inicio'   => $this->input->post('ffolio_inicio'),
+        'folio_fin'      => $this->input->post('ffolio_fin'),
+        'ano_aprobacion' => $this->input->post('fano_aprobacion'),
+        'tipo'           => $this->input->post('ftipo'),
     );
 
     $path_img = '';

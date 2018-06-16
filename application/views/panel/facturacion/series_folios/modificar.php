@@ -17,7 +17,15 @@
                 </select>
 			</p>
             <p class="clear"></p>
-            
+
+      <p class="f-l w50">
+        <label for="ftipo">Tipo</label><br>
+        <select name="ftipo" id="ftipo">
+          <option value="f" <?php echo set_select('ftipo', 'f', false, (isset($serie_info[0]->tipo)? $serie_info[0]->tipo: '')); ?>>Factura</option>
+          <option value="cp" <?php echo set_select('ftipo', 'cp', false, (isset($serie_info[0]->tipo)? $serie_info[0]->tipo: '')); ?>>Complemento de pago</option>
+        </select>
+      </p>
+
 			<p class="f-l w50">
 				<label for="fserie">Serie</label><br>
 				<input type="text" name="fserie" id="fserie" value="<?php echo (isset($serie_info[0]->serie)) ? $serie_info[0]->serie : set_value('fserie') ?>" size="30" autofocus maxlength="30">
@@ -61,7 +69,7 @@
 
 <!-- Bloque de alertas -->
 <?php if(isset($frm_errors)){
-	if($frm_errors['msg'] != ''){ 
+	if($frm_errors['msg'] != ''){
 ?>
 <div id="container" style="display:none">
 	<div id="withIcon">
@@ -75,8 +83,8 @@
 <script type="text/javascript" charset="UTF-8">
 $(function(){
 	create("withIcon", {
-		title: '<?php echo $frm_errors['title']; ?>', 
-		text: '<?php echo $frm_errors['msg']; ?>', 
+		title: '<?php echo $frm_errors['title']; ?>',
+		text: '<?php echo $frm_errors['msg']; ?>',
 		icon: '<?php echo base_url('application/images/alertas/'.$frm_errors['ico'].'.png'); ?>' });
 });
 </script>
