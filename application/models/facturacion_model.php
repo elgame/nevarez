@@ -2518,4 +2518,82 @@ class facturacion_model extends privilegios_model{
 
         return $response;
     }
+
+  public function getFacturasCp(){
+    $where = (isset($_GET['id'])) ? "WHERE id_cliente='{$_GET['id']}'" : "";
+    $res = $this->db->query("SELECT id_factura, id_cliente, cliente, serie, folio, total, parcialidad, pagos, saldo, uuid
+                FROM get_facturas_cp
+                {$where}
+                ");
+    $facturas = array();
+    if($res->num_rows() > 0)
+      $facturas = $res->result();
+    return $facturas;
+  }
+
+  public function addComPago()
+  {
+    $datos = $_POST;
+    // echo "<pre>";
+    //   var_dump($datos);
+    // echo "</pre>";exit;
+
+    // $queryMov            = $queryMov->result();
+    // $queryCliente        = isset($queryCliente)? $queryCliente->row() : null;
+    // $folio = $this->getFolioSerie('P', $queryMov[0]->id_empresa);
+    // if ($folio === false) {
+    //   return array("passes" => false, "codigo" => "14");
+    // }
+
+    // $queryMov[0]->num_cuenta = str_replace('-', '', $queryMov[0]->num_cuenta);
+
+    // xml 3.3
+    $this->load->library('cfdi');
+    $datosApi = $this->cfdi->obtenDatosCfdi33ComP($datos);
+    echo "<pre>";
+      var_dump($datosApi);
+    echo "</pre>";exit;
+
+    log_message('error', "ComPago");
+    log_message('error', json_encode($datosApi));
+    // Timbrado de la factura.
+    $result = $this->timbrar($datosApi, $id_movimiento);
+
+    if ($result['passes'])
+    {
+      $dataTimbrado = array(
+        'id_movimiento'   => $id_movimiento,
+        'id_empresa'      => $queryMov[0]->id_empresa,
+        'fecha'           => $datosApi['fecha'],
+        'serie'           => $datosApi['serie'],
+        'folio'           => $datosApi['folio'],
+        'xml'             => $result['timbrado']->data->xml,
+        'uuid'            => $result['timbrado']->data->uuid,
+        'cadena_original' => $result['timbrado']->data->cadenaOriginal,
+        'sello'           => $result['timbrado']->data->sello,
+        'version'         => $queryMov[0]->version,
+        'cfdi_ext'        => json_encode($datosApi),
+      );
+      $this->db->insert('banco_movimientos_com_pagos', $dataTimbrado);
+      $id_compago = $this->db->insert_id();
+
+      foreach ($queryMov as $key => $pago) {
+        $this->db->insert('facturacion_com_pagos', [
+          'id_movimiento' => $id_movimiento,
+          'id_factura'    => $pago->id_factura,
+        ]);
+      }
+
+      $this->db->query("SELECT refreshallmaterializedviews();");
+
+      $this->load->model('documentos_model');
+      $pathDocs = $this->documentos_model->creaDirectorioDocsCliente($datosApi['receptor']['nombreFiscal'], $dataTimbrado['serie'], $dataTimbrado['folio']);
+
+      $this->generaFacturaPdf33($id_compago, $pathDocs);
+
+    }
+
+    return $result;
+  }
+
 }

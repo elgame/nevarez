@@ -623,7 +623,7 @@ class cfdi{
     return $datosApi;
   }
 
-  public function obtenDatosCfdi33ComP($data, $cuentaCliente)
+  public function obtenDatosCfdi33ComP($data)
   {
     // echo "<pre>";
     //   var_dump($data, $cuentaCliente);
@@ -632,25 +632,19 @@ class cfdi{
 
     // Obtiene el ID de la empresa que emite la factura, si no llega
     // entonces obtiene el ID por default.
-    $id = isset($data[0]->id_empresa) ? $data[0]->id_empresa : $this->default_id_empresa;
+    $id = $data['didempresa'];
     // Carga los datos de la empresa que emite la factura.
     $this->cargaDatosFiscales($id, 'empresas');
 
-    // Obtiene los datos del receptor.
-    $CI->load->model('clientes_model');
-    $cliente = $CI->clientes_model->getClienteInfo($data[0]->id_cliente, true);
+    // // Obtiene los datos del receptor.
+    // $CI->load->model('clientes_model');
+    // $cliente = $CI->clientes_model->getClienteInfo($data[0]->id_cliente, true);
 
-    $CI->load->model('cuentas_cobrar_model');
+    // $CI->load->model('cuentas_cobrar_model');
 
-    $cfdi_ext = json_decode($data[0]->cfdi_ext);
+    // $cfdi_ext = json_decode($data[0]->cfdi_ext);
 
-    $formaDePago = '03';
-    if ($data[0]->forma_pago == 'transferencia')
-      $formaDePago = '03';
-    elseif ($data[0]->forma_pago == 'cheque')
-      $formaDePago = '02';
-    elseif ($data[0]->forma_pago == 'efectivo')
-      $formaDePago = '01';
+    $formaDePago = $data['dforma_pago'];
 
     $cfdiRel = array(
       'tipoRelacion' => '07',
@@ -659,46 +653,45 @@ class cfdi{
     $comPago = [
       'cadenaPago'        => "",
       'certificadoPago'   => "",
-      'cuentaBen'         => $data[0]->num_cuenta,
-      'cuentaOrd'         => $cuentaCliente->cuenta,
-      'fechaPago'         => str_replace(' ', 'T', substr($data[0]->fecha, 0, 19)),
+      'cuentaBen'         => $formaDePago != '01'? '': '',
+      'cuentaOrd'         => true? '' : '',
+      'fechaPago'         => substr($data['dfecha'].':00', 0, 19),
       'formaDePago'       => $formaDePago,
-      'moneda'            => $cfdi_ext->moneda,
-      'monto'             => $data[0]->pago,
+      'moneda'            => 'MXN',
+      'monto'             => $data['total'],
       'nombreBancoOrdExt' => "",
       'numOperacion'      => "1",
-      'rfcEmisorCtaBen'   => $data[0]->rfc,
-      'rfcEmisorCtaOrd'   => $cuentaCliente->rfc,
+      'rfcEmisorCtaBen'   => $formaDePago != '01'? '': '',
+      'rfcEmisorCtaOrd'   => true? '' : '',
       'selloPago'         => "",
       'tipoCadPago'       => "",
-      'tipoCambio'        => $cfdi_ext->tipoCambio,
+      'tipoCambio'        => '1',
       'doctoRelacionado'  => []
     ];
-    foreach ($data as $key => $pago) {
-      if (floatval($pago->version) > 3.2) {
-        $cfdiRel['cfdiRelacionado'][] = array(
-          'uuid' => $pago->uuid,
-        );
+    foreach ($data['facturas'] as $key => $pago) {
+      $cfdiRel['cfdiRelacionado'][] = array(
+        'uuid' => $pago['uuid'],
+      );
 
-        $saldo_factura = $CI->cuentas_cobrar_model->getDetalleVentaFacturaData($pago->id_factura, 'f', true, true);
-        $saldo_factura['saldo'] = floor($saldo_factura['saldo']*100)/100;
-        $saldoAnt = ($saldo_factura['saldo']+$pago->pago_factura);
-        $metodoDePago = 'PPD';
-        if ($saldo_factura['saldo'] == 0 && $pago->parcialidades == 1)
-          $metodoDePago = 'PUE';
-        $comPago['doctoRelacionado'][] = array(
-          "idDocumento"    => $pago->uuid,
-          "serie"          => $pago->serie,
-          "folio"          => $pago->folio,
-          "moneda"         => $cfdi_ext->moneda,
-          "tipoCambio"     => $cfdi_ext->tipoCambio,
-          "metodoDePago"   => $metodoDePago,
-          "numParcialidad" => $pago->parcialidades,
-          "saldoAnterior"  => $saldoAnt,
-          "importePagado"  => $pago->pago_factura,
-          "saldoInsoluto"  => $saldo_factura['saldo']
-        );
-      }
+      // $saldo_factura = $CI->cuentas_cobrar_model->getDetalleVentaFacturaData($pago->id_factura, 'f', true, true);
+      // $saldo_factura['saldo'] = floor($saldo_factura['saldo']*100)/100;
+      // $saldoAnt = ($saldo_factura['saldo']+$pago->pago_factura);
+      $metodoDePago = 'PPD';
+      if ($pago['total'] == $pago['abono'])
+        $metodoDePago = 'PUE';
+      $folio = explode('-', $pago['folio']);
+      $comPago['doctoRelacionado'][] = array(
+        "idDocumento"    => $pago['uuid'],
+        "serie"          => count($folio)>1? $folio[0]: '',
+        "folio"          => count($folio)>1? $folio[1]: $folio[0],
+        "moneda"         => 'MXN',
+        "tipoCambio"     => '1',
+        "metodoDePago"   => $metodoDePago,
+        "numParcialidad" => $pago['parcialidad'],
+        "saldoAnterior"  => $pago['saldo'],
+        "importePagado"  => $pago['abono'],
+        "saldoInsoluto"  => $pago['saldo']-$pago['abono']
+      );
     }
 
     $noCertificado = $this->obtenNoCertificado();
@@ -722,22 +715,22 @@ class cfdi{
         'key'           => $this->obtenKey($this->path_key),
       ),
       'receptor' => array(
-        'nombreFiscal' => $cliente['info']->nombre_fiscal,
-        'rfc'          => $cliente['info']->rfc,
-        'calle'        => $cliente['info']->calle,
-        'noExterior'   => $cliente['info']->no_exterior,
-        'noInterior'   => $cliente['info']->no_interior,
-        'colonia'      => $cliente['info']->colonia,
-        'localidad'    => $cliente['info']->localidad,
-        'municipio'    => $cliente['info']->municipio,
-        'estado'       => $cliente['info']->estado,
-        'pais'         => $cliente['info']->pais,
-        'cp'           => $cliente['info']->cp,
+        'nombreFiscal' => $data['dcliente'],
+        'rfc'          => $data['frfc'],
+        'calle'        => $data['fcalle'],
+        'noExterior'   => $data['fno_exterior'],
+        'noInterior'   => $data['fno_interior'],
+        'colonia'      => $data['fcolonia'],
+        'localidad'    => $data['flocalidad'],
+        'municipio'    => $data['fmunicipio'],
+        'estado'       => $data['festado'],
+        'pais'         => $data['fpais'],
+        'cp'           => $data['fcp'],
       ),
-      'serie'             => 'P',
-      'folio'             => $cuentaCliente->folio,
+      'serie'             => $data['dserie'],
+      'folio'             => $data['dfolio'],
       'fecha'             => date("Y-m-d\TH:i:s"),
-      'formaDePago'       => '03',
+      'formaDePago'       => '99',
       'condicionesDePago' => 'CONTADO',
       'moneda'            => 'XXX',
       'tipoCambio'        => '1',
