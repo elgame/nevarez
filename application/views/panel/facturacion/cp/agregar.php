@@ -56,6 +56,28 @@
 				<textarea id="fobservaciones" name="fobservaciones" rows="5" cols="40"><?php echo set_value('fobservaciones'); ?></textarea>
 			</p>
 			<div class="clear"></div>
+
+			<fieldset style="margin-bottom: 20px">
+				<legend>Datos de cuentas</legend>
+				<p class="f-l w50">
+					<label for="cuentaBen" class="f-l">Cuenta Beneficiario</label><br>
+					<input type="text" name="cuentaBen" value="<?php echo set_value('cuentaBen');?>" size="45" id="cuentaBen" class="f-l not">
+				</p>
+				<p class="f-l w50">
+					<label for="rfcEmisorCtaBen" class="f-l">RFC Cuenta Beneficiario (Banco)</label><br>
+					<input type="text" name="rfcEmisorCtaBen" value="<?php echo set_value('rfcEmisorCtaBen');?>" size="45" id="rfcEmisorCtaBen" class="f-l not">
+				</p>
+				<p class="f-l w50">
+					<label for="cuentaOrd" class="f-l">Cuenta Ordenante</label><br>
+					<input type="text" name="cuentaOrd" value="<?php echo set_value('cuentaOrd');?>" size="45" id="cuentaOrd" class="f-l not">
+				</p>
+				<p class="f-l w50">
+					<label for="rfcEmisorCtaOrd" class="f-l">RFC Cuenta Ordenante (Banco)</label><br>
+					<input type="text" name="rfcEmisorCtaOrd" value="<?php echo set_value('rfcEmisorCtaOrd');?>" size="45" id="rfcEmisorCtaOrd" class="f-l not">
+				</p>
+			</fieldset>
+
+			<div class="clear"></div>
 			<fieldset>
 				<legend>Selección de Facturas</legend>
 				<p class="f-l w50">

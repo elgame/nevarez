@@ -212,6 +212,10 @@ function ajax_submit_form(){
             post.festado = $('#festado').val();
             post.fcp = $('#fcp').val();
             post.fpais = $('#fpais').val();
+            post.cuentaBen = $('#cuentaBen').val();
+            post.rfcEmisorCtaBen = $('#rfcEmisorCtaBen').val();
+            post.cuentaOrd = $('#cuentaOrd').val();
+            post.rfcEmisorCtaOrd = $('#rfcEmisorCtaOrd').val();
 
             post.didempresa = $('#didempresa').val();
             post.fplazo_credito = $('#fplazo_credito').val();
