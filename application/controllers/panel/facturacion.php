@@ -834,6 +834,38 @@ class facturacion extends MY_Controller {
   }
 
 
+  private function lista_cp(){
+    $this->carabiner->css(array(
+      array('libs/jquery.msgbox.css', 'screen'),
+      array('libs/jquery.superbox.css', 'screen'),
+      array('general/tables.css', 'screen'),
+      array('general/forms.css', 'screen')
+    ));
+    $this->carabiner->js(array(
+      array('libs/jquery.msgbox.min.js'),
+      array('libs/jquery.superbox.js'),
+      array('general/msgbox.js'),
+      array('facturacion/admin.js')
+    ));
+    $this->load->model('facturacion_model');
+    $this->load->library('pagination');
+
+    $params['info_empleado'] = $this->info_empleado['info']; //info empleado
+    $params['opcmenu_active'] = 'Facturas'; //activa la opcion del menu
+    $params['seo'] = array(
+      'titulo' => 'Administrar Facturas'
+    );
+
+    $params['facturas'] = $this->facturacion_model->getFacturas('cp');
+
+    if(isset($_GET['msg']{0}))
+      $params['frm_errors'] = $this->showMsgs($_GET['msg']);
+
+    $this->load->view('panel/header', $params);
+    $this->load->view('panel/general/menu', $params);
+    $this->load->view('panel/facturacion/admin', $params);
+    $this->load->view('panel/footer');
+  }
 
   private function agregar_cp(){
     $this->carabiner->css(array(
