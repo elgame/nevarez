@@ -10,12 +10,16 @@ class facturacion extends MY_Controller {
    * Evita la validacion (enfocado cuando se usa ajax). Ver mas en privilegios_model
    * @var unknown_type
    */
-  private $excepcion_privilegio = array('facturacion/ajax_get_total_tickets/','facturacion/ajax_get_folio/','facturacion/ajax_agrega_factura/','facturacion/imprimir_pdf/',
+  private $excepcion_privilegio = array('facturacion/ajax_get_total_tickets/','facturacion/ajax_get_folio/',
+    'facturacion/ajax_agrega_factura/','facturacion/imprimir_pdf/',
     'facturacion/ajax_actualiza_digitos/','facturacion/pdf_rm/','facturacion/descargar_rm/',
     'facturacion/parchefac/',
     'facturacion/ajax_valida_folio/',
     'facturacion/imprimir_pdfm/',
-    'facturacion/ajax_get_seriesfromempresa/');
+    'facturacion/ajax_get_seriesfromempresa/',
+    'facturacion/facturas_cp/',
+    'facturacion/ajax_agrega_cp/',
+    );
 
   public function _remap($method){
     $this->carabiner->css(array(
@@ -87,8 +91,13 @@ class facturacion extends MY_Controller {
   }
 
   private function ajax_get_seriesfromempresa(){//ESTA FUNCION ES NUEVA JORGE
+    $sql = '';
+    if (isset($_POST['tipo'])) {
+        $sql = " AND tipo = '{$_POST['tipo']}'";
+    }
     $id_empresa = (strlen($_POST['id_empresa'])>0)? trim($_POST['id_empresa']) : 0;
-    $query = $this->db->query("SELECT id_serie_folio, (COALESCE(leyenda,'') || '-' || serie) as serie FROM facturacion_series_folios where id_empresa = '{$id_empresa}'");
+    $query = $this->db->query("SELECT id_serie_folio, (COALESCE(leyenda,'') || '-' || serie) as serie
+        FROM facturacion_series_folios where id_empresa = '{$id_empresa}' {$sql}");
 
     $res = $query->result();
     $output = '<option value="">---------------------------</option>';
@@ -823,6 +832,227 @@ class facturacion extends MY_Controller {
       return false;
     }
   }
+
+
+
+  private function agregar_cp(){
+    $this->carabiner->css(array(
+      array('libs/jquery.msgbox.css', 'screen'),
+      array('libs/jquery.superbox.css', 'screen'),
+      array('general/forms.css','screen'),
+      array('general/tables.css','screen')
+    ));
+
+    $this->carabiner->js(array(
+      array('libs/jquery.msgbox.min.js'),
+      array('libs/jquery.superbox.js'),
+      array('libs/jquery.numeric.js'),
+      array('general/util.js'),
+      array('general/msgbox.js'),
+      array('facturacion/frm_addmod_cp.js')
+    ));
+
+    $params['info_empleado']        = $this->info_empleado['info'];
+    $params['opcmenu_active'] = 'Facturas'; //activa la opcion del menu
+    $params['seo']  = array('titulo' => 'Complemento de pago');
+
+    $this->load->library('cfd');
+    $this->load->model('facturacion_model');
+    $this->load->model('empresas_model');
+
+    $params['empresas'] = $this->empresas_model->getEmpresas();
+    $params['empresas'] = $params['empresas']['empresas'];
+
+    if($this->input->get('fidempresa') && intval($this->input->get('fidempresa'))>0){
+      $query = $this->db->query("SELECT id_serie_folio, (COALESCE(leyenda,'') || '-' || serie) as serie FROM facturacion_series_folios");
+      $params['series'] = $query->result();
+    }else
+      $params['series'] = array();
+
+    $metodosPago       = new MetodosPago();
+    $formaPago         = new FormaPago();
+    $usoCfdi           = new UsoCfdi();
+    $tipoDeComprobante = new TipoDeComprobante();
+
+    $params['metodosPago']       = $metodosPago->get()->all();
+    $params['formaPago']         = $formaPago->get()->all();
+    $params['usoCfdi']           = $usoCfdi->get()->all();
+    $params['tipoDeComprobante'] = $tipoDeComprobante->get()->all();
+
+    //$params['no_certificado'] = $this->cfd->obtenNoCertificado();
+
+    if(isset($_GET['msg']{0}))
+      $params['frm_errors'] = $this->showMsgs($_GET['msg']);
+
+    $this->load->view('panel/header',$params);
+    $this->load->view('panel/general/menu',$params);
+    $this->load->view('panel/facturacion/cp/agregar',$params);
+    $this->load->view('panel/footer',$params);
+  }
+
+    public function facturas_cp(){
+        $this->carabiner->css(array(
+                array('general/forms.css', 'screen'),
+                array('general/tables.css', 'screen')
+        ));
+
+        $this->carabiner->js(array(
+                array('facturacion/facturas_cp.js')
+        ));
+        $params['seo'] = array(
+                'titulo' => 'Facturas'
+        );
+
+        $this->load->model('facturacion_model');
+        $params['cliente'] = array('facturas' => $this->facturacion_model->getFacturasCp());
+
+        $this->load->view('panel/facturacion/cp/facturas_cp',$params);
+    }
+
+    private function ajax_agrega_cp() {
+        $this->load->library('form_validation');
+        $rules = array(
+          array('field' => 'hcliente',
+            'label' => 'Cliente',
+            'rules' => 'required|max_length[25]'),
+          array('field' => 'dcliente',
+            'label' => 'Cliente',
+            'rules' => 'max_length[130]'),
+          array('field' => 'frfc',
+            'label' => 'RFC',
+            'rules' => 'max_length[13]'),
+          array('field' => 'fcalle',
+            'label' => 'Calle',
+            'rules' => 'max_length[60]'),
+          array('field' => 'fno_exterior',
+            'label' => 'No. Ext',
+            'rules' => 'max_length[7]'),
+          array('field' => 'fno_interior',
+            'label' => 'No. Int',
+            'rules' => 'max_length[7]'),
+          array('field'   => 'fcolonia',
+            'label'         => 'Colonia',
+            'rules'         => 'max_length[60]'),
+          array('field'   => 'flocalidad',
+            'label'         => 'Localidad',
+            'rules'         => 'max_length[45]'),
+          array('field'   => 'fmunicipio',
+            'label'         => 'Municipio',
+            'rules'         => 'max_length[45]'),
+          array('field'   => 'festado',
+            'label'         => 'Estado',
+            'rules'         => 'max_length[45]'),
+          array('field'   => 'fcp',
+            'label'         => 'CP',
+            'rules'         => 'max_length[10]'),
+          array('field'   => 'fpais',
+            'label'         => 'País',
+            'rules'         => 'max_length[60]'),
+          array('field'   => 'fplazo_credito',
+            'label'         => 'Plazo de Crédito',
+            'rules'         => 'required|is_natural'),
+          array('field'   => 'dfecha',
+            'label'         => 'Fecha',
+            'rules'         => 'required'),
+
+          array('field'   => 'cuentaBen',
+            'label'         => 'Cuenta Beneficiario',
+            'rules'         => 'max_length[18]'),
+          array('field'   => 'rfcEmisorCtaBen',
+            'label'         => 'RFC Cuenta Beneficiario',
+            'rules'         => 'max_length[13]'),
+          array('field'   => 'cuentaOrd',
+            'label'         => 'Cuenta Ordenante',
+            'rules'         => 'max_length[18]'),
+          array('field'   => 'rfcEmisorCtaOrd',
+            'label'         => 'RFC Cuenta Ordenante',
+            'rules'         => 'max_length[13]'),
+          // array('field'   => 'dcondicion_pago',
+          //   'label'         => 'Condicion de Pago',
+          //   'rules'         => 'required'),
+          // array('field'   => 'dleyendaserie',
+          //   'label'         => 'Leyenda-Serie',
+          //   'rules'         => 'required'),
+          array('field'   => 'dserie',
+            'label'         => 'Serie',
+            'rules'         => 'required|max_length[30]'),
+          array('field'   => 'dfolio',
+            'label'         => 'Folio',
+            'rules'         => 'required|is_natural'),
+          array('field'   => 'dano_aprobacion',
+            'label'         => 'Año de Aprobación',
+            'rules'         => 'required|max_length[4]|callback_isValidYear'),
+          array('field'   => 'dno_aprobacion',
+            'label'         => 'No. de Aprobación',
+            'rules'         => 'required|is_natural'),
+          array('field'   => 'dno_certificado',
+            'label'         => 'No. de Certificado',
+            'rules'         => 'required|max_length[100]'),
+          array('field'   => 'dtipo_comprobante',
+            'label'         => 'Tipo de Comprobante',
+            'rules'         => 'required|max_length[10]'),
+          array('field'   => 'dforma_pago',
+            'label'         => 'Forma de Pago',
+            'rules'         => 'required'),
+          // array('field'   => 'dmetodo_pago',
+          //   'label'         => 'Metodo de Pago',
+          //   'rules'         => 'required'),
+          array('field'   => 'duso_cfdi',
+            'label'         => 'Uso de CFDI',
+            'rules'         => 'required'),
+          // array('field'   => 'subtotal',
+          //   'label'         => 'Subtotal',
+          //   'rules'         => 'required'),
+          // array('field'   => 'iva',
+          //   'label'         => 'Iva',
+          //   'rules'         => 'required'),
+          // array('field'   => 'total_isr',
+          //   'label'         => 'ISR',
+          //   'rules'         => 'required'),
+          array('field'   => 'total',
+            'label'         => 'Total',
+            'rules'         => 'required'),
+          array('field'   => 'dttotal_letra',
+            'label'         => 'Importe con Letra',
+            'rules'         => 'max_length[250]'),
+          array('field'   => 'fobservaciones',
+            'label'         => 'Observaciones',
+            'rules'         => 'max_length[850]'),
+          array('field'   => 'facturas',
+            'label'         => 'Facturas',
+            'rules'         => 'required')
+        );
+
+        if(isset($_POST['dforma_pago']))
+          if($_POST['dforma_pago']==1)
+            $rules[] = array('field' => 'dforma_pago_parcialidad',
+              'label' => 'Formas de Pago',
+              'rules' => 'required|max_length[80]');
+
+          // if(isset($_POST['dmetodo_pago']))
+          //   if($_POST['dmetodo_pago']!='efectivo' && $_POST['dmetodo_pago']!='')
+          //     $rules[] = array('field' => 'dmetodo_pago_digitos',
+          //       'label' => 'Ultimos 4 digitos',
+          //       'rules' => 'max_length[20]');
+
+        $this->form_validation->set_rules($rules);
+        if($this->form_validation->run() == FALSE)
+        {
+          $params['msg']  = $this->showMsgs(2,preg_replace("[\n|\r|\n\r]", '', validation_errors()));
+        }
+        else
+        {
+          $this->load->model('facturacion_model');
+          $params = $this->facturacion_model->addComPago();
+          if($params[0])
+            $params['msg'] = $this->showMsgs(4);
+          else{
+            $params['msg'] = $this->showMsgs(2, $params['resultado']['msg']);
+          }
+        }
+        echo json_encode($params);
+    }
+
 
   /**
    * Muestra mensajes cuando se realiza alguna accion
