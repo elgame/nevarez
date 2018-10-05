@@ -5,7 +5,7 @@ class facturacion_model extends privilegios_model{
     parent::__construct();
   }
 
-  public function getFacturas(){
+  public function getFacturas($tipo='f'){
     $sql = '';
     //paginacion
     $params = array(
@@ -29,6 +29,11 @@ class facturacion_model extends privilegios_model{
         break;
     }
 
+    $sql_relacion = " AND f.tipo_comprobante <> 'cp'";
+    if ($tipo == 'cp') {
+      $sql_relacion = " AND f.tipo_comprobante = 'cp'";
+    }
+
     if($this->input->get('fstatus') =='')
       $sql = "f.status<>''";
 
@@ -46,7 +51,7 @@ class facturacion_model extends privilegios_model{
     $query = BDUtil::pagination("
         SELECT f.id_factura, f.serie, f.folio, f.fecha, f.condicion_pago, nombre as cliente, f.status
         FROM facturacion as f
-        WHERE ".$sql."
+        WHERE ".$sql.$sql_relacion."
         ORDER BY (f.id_factura, DATE(f.fecha)) DESC
         ", $params, true);
         $res = $this->db->query($query['query']);
@@ -792,7 +797,7 @@ class facturacion_model extends privilegios_model{
         // Si es true $delFile entonces elimina todo lo relacionado con la factura.
         if ($delFiles)
         {
-          $this->db->delete('facturacion', array('id_factura' => $idFactura));
+          $this->db->delete('facturacion', array('id_factura' => "$idFactura"));
           // unlink($pathXML);
         }
 
