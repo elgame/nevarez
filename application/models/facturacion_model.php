@@ -1979,8 +1979,9 @@ class facturacion_model extends privilegios_model{
       $pdf->Cell(108, 4, "Folio Fiscal:", 0, 0, 'R', 1);
 
       $pdf->SetXY(109, 0);
-      $tipoDeComprobante = " ({$factura['cfdi_ext']->tipoDeComprobante} - {$factura['tipo_comprobante']})";
-      $pdf->Cell(50, 4, (!isset($factura['id_nc']) ? 'Factura' : 'Nota de Crédito').$tipoDeComprobante.': '.($factura['serie'].$factura['folio']) , 0, 0, 'L', 1);
+      $factura['tipo_comprobante'] = $factura['tipo_comprobante']==='cp'? '': ' - '.$factura['tipo_comprobante'];
+      $tipoDeComprobante = " ({$factura['cfdi_ext']->tipoDeComprobante}{$factura['tipo_comprobante']})";
+      $pdf->Cell(50, 4, (!isset($factura['id_nc']) ? ($factura['tipo_comprobante']!=''? 'Factura': 'Complemento de Pago') : 'Nota de Crédito').$tipoDeComprobante.': '.($factura['serie'].$factura['folio']) , 0, 0, 'L', 1);
 
       $pdf->SetTextColor(0, 0, 0);
       $pdf->SetXY(109, 6);
