@@ -1,7 +1,7 @@
 
  ✔ Complemento de pago @done (18-10-06 13:51)
-    INSERT INTO public.privilegios(nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('Complementos de pago','l4fba64a9b6bd36.19107194',TRUE,'facturacion/lista_cp/','facturacion.png',FALSE);
-    INSERT INTO public.privilegios(nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('Agregar','l5bb7b7834f8a40.34557076',TRUE,'facturacion/agregar_cp/','add.png',FALSE);
+    INSERT INTO public.privilegios(id_privilegio, nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('1l4fba64a9b6bd36.19107194', 'Complementos de pago','l4fba64a9b6bd36.19107194',TRUE,'facturacion/lista_cp/','facturacion.png',FALSE);
+    INSERT INTO public.privilegios(id_privilegio, nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('2l4fba64a9b6bd36.19107194', 'Agregar','l5bb7b7834f8a40.34557076',TRUE,'facturacion/agregar_cp/','add.png',FALSE);
     ALTER TABLE public.facturacion_series_folios ADD COLUMN tipo character varying(10) NOT NULL DEFAULT 'f'::character varying;
     COMMENT ON COLUMN public.facturacion_series_folios.tipo IS 'f: factura, cp: complemento de pago';
     CREATE TABLE public.facturacion_compago
