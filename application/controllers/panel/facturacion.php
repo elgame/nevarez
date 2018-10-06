@@ -80,6 +80,7 @@ class facturacion extends MY_Controller {
     );
 
     $params['facturas'] = $this->facturacion_model->getFacturas();
+    $params['url_filtros'] = '';
 
     if(isset($_GET['msg']{0}))
       $params['frm_errors'] = $this->showMsgs($_GET['msg']);
@@ -857,6 +858,7 @@ class facturacion extends MY_Controller {
     );
 
     $params['facturas'] = $this->facturacion_model->getFacturas('cp');
+    $params['url_filtros'] = '/lista_cp';
 
     if(isset($_GET['msg']{0}))
       $params['frm_errors'] = $this->showMsgs($_GET['msg']);
