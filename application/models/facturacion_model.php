@@ -736,7 +736,7 @@ class facturacion_model extends privilegios_model{
     * @param  boolean $delFiles
     * @return void
     */
-    private function timbrar($dataXml, $idFactura=0, $delFiles = true)
+    private function timbrar($dataXml, $idFactura='', $delFiles = true)
     {
       $this->load->library('facturartebarato_api');
 
@@ -784,7 +784,7 @@ class facturacion_model extends privilegios_model{
           'cfdi_ext'        => json_encode($dataXml),
         );
         $result['timbrado'] = $dataTimbrado;
-        if ($idFactura > 0) {
+        if ($idFactura != '') {
           $this->db->update('facturacion', $dataTimbrado, array('id_factura' => $idFactura));
         }
         log_message('error', var_export($dataTimbrado, true));
