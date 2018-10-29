@@ -3,7 +3,7 @@ var subtotal = 0;
 var iva = 0;
 var total = 0;
 
-var tickets_selecc = {}; // almacena los tickets que han sido agregados
+var facturas_selecc = []; // almacena los tickets que han sido agregados
 var tickets_data = {}; //almacena la informacion de los tickets que sera enviada por POST
 var indice = 0; // indice para controlar los vuelos q han sido agregados
 
@@ -44,14 +44,14 @@ $(function(){
         selectFirst: true,
         select: function( event, ui ) {
             $("#dfiltro-cliente").css("background-color", "#B0FFB0");
-            $('.addv').html('<a href="'+base_url+'panel/tickets/tickets_cliente/?id='+ui.item.id+'" id="btnAddTicket" class="linksm" style="margin: 0px;" rel="superbox[iframe][700x500]"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Tickets</a>');
+            $('.addv').html('<a href="'+base_url+'panel/facturacion/facturas_cp/?id='+ui.item.id+'" id="btnAddTicket" class="linksm" style="margin: 0px;" rel="superbox[iframe][700x500]"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Facturas</a>');
             $.superbox();
         }
     });
 
     $("#dfiltro-cliente").on("keydown", function(event){
         if(event.which == 8 || event == 46){
-            $('.addv').html('<a href="'+base_url+'panel/tickets/tickets_cliente/" id="btnAddTicket" class="linksm" style="margin: 0px;" rel="superbox[iframe][700x500]"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Tickets</a>');
+            $('.addv').html('<a href="'+base_url+'panel/facturacion/facturas_cp/" id="btnAddTicket" class="linksm" style="margin: 0px;" rel="superbox[iframe][700x500]"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Facturas</a>');
             $("#dfiltro-cliente").val("").css("background-color", "#FFD9B3");
             $.superbox();
         }
@@ -91,7 +91,7 @@ $(function(){
 
 function get_seriesfrom_empresa(id_empresa){
 	loader.create();
-    $.post(base_url+'panel/facturacion/ajax_get_seriesfromempresa/', {id_empresa:id_empresa, tipo: 'f'}, function(resp){
+    $.post(base_url+'panel/facturacion/ajax_get_seriesfromempresa/', {id_empresa:id_empresa, tipo: 'cp'}, function(resp){
         $('#dleyendaserie').html(resp.series);
 		$('#dno_certificado').val(resp.numcertificado);
     }, "json").complete(function(){
@@ -160,77 +160,32 @@ function ajax_get_folio(param){
 });
 }
 
-function ajax_get_total_tickets(data){
-        loader.create();
-        $.post(base_url+'panel/facturacion/ajax_get_total_tickets/', {'tickets[]':data}, function(resp){
+function agregar_facturas_cp(data){
+  console.log(data, facturas_selecc);
+  if (facturas_selecc.length > 0) {
+    for(var factura in facturas_selecc){
+      total += parseFloat(facturas_selecc[factura].saldo, 2);
 
-        if(resp.tickets){
-                var opc_elimi = '', subtotal_vuelos_isr=0;
-
-            for(var i in resp.tickets){
-                    tickets_data[indice] = {};
-                    tickets_data[indice]['ticket'+i] = {};
-                    tickets_data[indice]['ticket'+i].id_ticket              = resp.tickets[i].id_ticket;
-                    tickets_data[indice]['ticket'+i].folio                  = resp.tickets[i].folio;
-//                              tickets_data[indice]['ticket'+i].cantidad               = resp.tickets[i].cantidad;
-//                              tickets_data[indice]['ticket'+i].precio_unitario= parseFloat(resp.tickets[i].precio_unitario,2);
-//                              tickets_data[indice]['ticket'+i].importe                = parseFloat(resp.tickets[i].precio_unitario,2);
-//                              tickets_data[indice]['ticket'+i].total                  = parseFloat(resp.tickets[i].total_ticket,2);
-//                              tickets_data[indice]['ticket'+i].importe_iva_0  = parseFloat(resp.tickets[i].importe_iva_0,2);
-//                              tickets_data[indice]['ticket'+i].importe_iva_10 = parseFloat(resp.tickets[i].importe_iva_10,2);
-//                              tickets_data[indice]['ticket'+i].importe_iva_16 = parseFloat(resp.tickets[i].importe_iva_16,2);
-
-                    vals= '{indice:'+indice+', subtotal:'+resp.tickets[i].subtotal_ticket+', iva: '+resp.tickets[i].iva_ticket+', total:'+resp.tickets[i].total_ticket+'}';
-
-                    opc_elimi = '<a href="javascript:void(0);" class="linksm"'+
-                            'onclick="msb.confirm(\'Estas seguro de eliminar el ticket?\', '+vals+', eliminaTickets); return false;">'+
-                            '<img src="'+base_url+'application/images/privilegios/delete.png" width="10" height="10">Eliminar Ticket</a>';
-
-//                              //Agrego el tr con la informacion de los productos del ticket
-                    id = resp.tickets[i].id_ticket;
-                    for(var p in resp.productos[id]){
-                            $("#tbl_tickets tr.header:last").after(
-                            '<tr id="e'+indice+'" class="'+resp.productos[id][p].tipo+'" data-importe="'+resp.productos[id][p].importe+'">'+
-                            '       <td></td>'+
-                            '       <td>'+resp.productos[id][p].cantidad+'</td>'+
-                            '       <td>'+resp.productos[id][p].unidad+'</td>'+
-                            '       <td>'+resp.productos[id][p].descripcion+'</td>'+
-                            '       <td>'+resp.productos[id][p].precio_unitario+'</td>'+
-                            '       <td>'+resp.productos[id][p].importe+'</td>'+
-                            '       <td></td>'+
-                            '</tr>');
-                            if(resp.productos[id][p].tipo == 'vu'){
-                                    subtotal_vuelos_isr += parseFloat(resp.productos[id][p].importe);
-                            }
-                    }
-
-                    $("#tbl_tickets tr.header:last").after(
-                                    '<tr id="e'+indice+'" style="background-color:#FFFED9">'+
-                                    '       <td colspan="6">'+resp.tickets[i].folio+'</td>'+
-                                    '       <td class="tdsmenu a-c" style="width: 90px;">'+
-                                    '               <img alt="opc" src="'+base_url+'application/images/privilegios/gear.png" width="16" height="16">'+
-                                    '               <div class="submenul">'+
-                                    '                       <p class="corner-bottom8">'+
-                                                                            opc_elimi+
-                                    '                       </p>'+
-                                    '               </div>'+
-                                    '       </td>'+
-                                    '</tr>');
-
-                    subtotal        += parseFloat(resp.tickets[i].subtotal_ticket, 2);
-                    iva                     += parseFloat(resp.tickets[i].iva_ticket, 2);//parseFloat(subtotal*taza_iva, 2);
-                    total           += parseFloat(resp.tickets[i].total_ticket, 2);
-                    indice++;
-            }
-            if(aux_isr){
-                    total_isr += parseFloat(subtotal_vuelos_isr*0.1, 2);
-                    ttcisr = total-total_isr;
-            }
-            updateTablaPrecios();
-        }
-        }, "json").complete(function(){
-        loader.close();
-    });
+      $("#tbl_tickets tr.header:last").after(
+      '<tr id="e'+factura+'">'+
+      '       <td>'+facturas_selecc[factura].folio+'</td>'+
+      '       <td>'+facturas_selecc[factura].cliente+'</td>'+
+      '       <td>'+facturas_selecc[factura].parcialidad+'</td>'+
+      '       <td>'+facturas_selecc[factura].saldo+'</td>'+
+      '       <td class="tdsmenu a-c" style="width: 90px;">'+
+      '         <img alt="opc" src="'+base_url+'application/images/privilegios/gear.png" width="16" height="16">'+
+      '           <div class="submenul">'+
+      '             <p class="corner-bottom8">'+
+                      '<a href="javascript:void(0);" class="linksm"'+
+                      'onclick="msb.confirm(\'Estas seguro de quitar la factura?\', '+factura+', quitarFactura); return false;">'+
+                      '<img src="'+base_url+'application/images/privilegios/delete.png" width="10" height="10">Quitar</a>'+
+      '             </p>'+
+      '           </div>'+
+      '       </td>'+
+      '</tr>');
+    }
+    updateTablaPrecios();
+  }
 }
 
 function ajax_submit_form(){
@@ -257,55 +212,58 @@ function ajax_submit_form(){
             post.festado = $('#festado').val();
             post.fcp = $('#fcp').val();
             post.fpais = $('#fpais').val();
+            post.cuentaBen = $('#cuentaBen').val();
+            post.rfcEmisorCtaBen = $('#rfcEmisorCtaBen').val();
+            post.cuentaOrd = $('#cuentaOrd').val();
+            post.rfcEmisorCtaOrd = $('#rfcEmisorCtaOrd').val();
 
             post.didempresa = $('#didempresa').val();
             post.fplazo_credito = $('#fplazo_credito').val();
             post.dfecha = $('#dfecha').val();
-            post.dcondicion_pago = $('#dcondicion_pago').val();
-            post.dleyendaserie = $('#dleyendaserie').val();
+            // post.dcondicion_pago = $('#dcondicion_pago').val();
+            // post.dleyendaserie = $('#dleyendaserie').val();
             post.dserie = $('#dserie').val();
             post.dfolio = $('#dfolio').val();
             post.dano_aprobacion = $('#dano_aprobacion').val();
             post.dno_aprobacion = $('#dno_aprobacion').val();
             post.dno_certificado = $('#dno_certificado').val();
-            post.dtipo_comprobante = $('#dtipo_comprobante').val();
+            post.dtipo_comprobante = 'cp';
             post.dforma_pago = $('#dforma_pago').val();
             post.dforma_pago_parcialidad = $('#dforma_pago_parcialidad').val();
-            post.dmetodo_pago = $('#dmetodo_pago').val();
-            post.dmetodo_pago_digitos = $('#dmetodo_pago_digitos').val();
-            post.duso_cfdi = $('#duso_cfdi').val();
+            // post.dmetodo_pago = $('#dmetodo_pago').val();
+            // post.dmetodo_pago_digitos = $('#dmetodo_pago_digitos').val();
+            post.duso_cfdi = 'P01';
 
-            post.subtotal = parseFloat(subtotal,2);
-            post.iva = parseFloat(iva,2);
-            post.total_isr = parseFloat(total_isr,2);
+            // post.subtotal = parseFloat(subtotal,2);
+            // post.iva = parseFloat(iva,2);
+            // post.total_isr = parseFloat(total_isr,2);
 
-            post.fobservaciones = $('#fobservaciones').val();
+            // post.fobservaciones = $('#fobservaciones').val();
 
-            if(aux_isr)
-                post.total = parseFloat(ttcisr,2);
-            else
-                post.total = parseFloat(total,2);
+            post.total = parseFloat(total,2);
 
-            post.dtotal_letra = $('#dttotal_letra').val();
+            // post.dtotal_letra = $('#dttotal_letra').val();
 
-            var count=0;
-            for(var i in tickets_selecc)
-                    for(var x in tickets_selecc[i])
-                            count++;
-            if(count>0)
-                    post.tickets    = count;
+            post.facturas = facturas_selecc;
 
-            cont=1;
-            for(var i in tickets_data){
-                for(var x in tickets_data[i]){
-                        post['pticket'+cont]    = {};
-                        post['pticket'+cont]    = tickets_data[i][x];
-                        cont++;
-                }
-            }
+            // var count=0;
+            // for(var i in facturas_selecc)
+            //         for(var x in facturas_selecc[i])
+            //                 count++;
+            // if(count>0)
+            //         post.tickets    = count;
+
+            // cont=1;
+            // for(var i in tickets_data){
+            //     for(var x in tickets_data[i]){
+            //             post['pticket'+cont]    = {};
+            //             post['pticket'+cont]    = tickets_data[i][x];
+            //             cont++;
+            //     }
+            // }
 
             loader.create();
-            $.post(base_url+'panel/facturacion/ajax_agrega_factura/', post, function(resp){
+            $.post(base_url+'panel/facturacion/ajax_agrega_cp/', post, function(resp){
                 create("withIcon", {
                     title: resp.msg.title,
                     text: resp.msg.msg,
@@ -346,44 +304,16 @@ function ajax_submit_form(){
     });
 }
 
-function eliminaTickets(vals){
-        delete tickets_selecc[vals.indice];
-        delete tickets_data[vals.indice];
-        var subtotal_vuelos_isr = 0;
+function quitarFactura(indice){
+  total -= parseFloat(facturas_selecc[indice].saldo, 2);
+  updateTablaPrecios();
 
-        $('tr#e'+vals.indice+'.vu').each(function(){
-                subtotal_vuelos_isr += parseFloat($(this).attr("data-importe"));
-        });
-        $('tr#e'+vals.indice).remove();
-
-        subtotal        -= parseFloat(vals.subtotal, 2);
-        iva                     -= parseFloat(vals.iva, 2);
-        total           -= parseFloat(vals.total, 2);
-
-        if(aux_isr){
-                total_isr       -= parseFloat(subtotal_vuelos_isr*0.1,2);
-                ttcisr = total-total_isr;
-        }
-        updateTablaPrecios();
+  delete facturas_selecc[indice];
+  $('tr#e'+indice).remove();
 }
 
 function updateTablaPrecios(){
-        $('#ta_subtotal').text(util.darFormatoNum(subtotal));
-        $('#ta_iva').text(util.darFormatoNum(iva));
-        $('#ta_isr').text(util.darFormatoNum(total_isr));
-        if(aux_isr)
-                $('#ta_total').text(util.darFormatoNum(ttcisr));
-        else
-                $('#ta_total').text(util.darFormatoNum(total));
-
-        if(parseFloat(total,2)!=0){
-                if(aux_isr)
-                        $('#dttotal_letra').val(util.numeroToLetra.covertirNumLetras(ttcisr.toString()));
-                else
-                        $('#dttotal_letra').val(util.numeroToLetra.covertirNumLetras(total.toString()));
-        }
-        else
-                $('#dttotal_letra').val('');
+  $('#ta_total').text(util.darFormatoNum(total));
 }
 
 function limpia_campos(){
@@ -419,14 +349,14 @@ function limpia_campos(){
         subtotal = 0;
         iva = 0;
         total = 0;
-        tickets_selecc = {};
+        facturas_selecc = [];
         tickets_data = {};
         post = {};
         indice = 0;
         aux_isr = false;
         total_isr = 0;
 
-//        $('.addv').html('<a href="javascript:void(0);" id="btnAddTicket" class="linksm f-r" style="margin: 10px 0 20px 0;" onclick="alerta(\'Seleccione un Cliente !\');"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Tickets</a>');
+//        $('.addv').html('<a href="javascript:void(0);" id="btnAddTicket" class="linksm f-r" style="margin: 10px 0 20px 0;" onclick="alerta(\'Seleccione un Cliente !\');"> <img src="'+base_url+'application/images/privilegios/add.png" width="16" height="16">Agregar Facturas</a>');
 }
 
 function alerta(msg){

@@ -13,7 +13,14 @@
                 </select>
 			</p>
             <p class="clear"></p>
-            
+
+      <p class="f-l w50">
+        <label for="ftipo">Tipo</label><br>
+        <select name="ftipo" id="ftipo">
+          <option value="f" <?php echo set_select('ftipo', 'f', false, $this->input->post('ftipo')); ?>>Factura</option>
+          <option value="cp" <?php echo set_select('ftipo', 'cp', false, $this->input->post('ftipo')); ?>>Complemento de pago</option>
+        </select>
+      </p>
 			<p class="f-l w50">
 				<label for="fserie">Serie</label><br>
 				<input type="text" name="fserie" id="fserie" value="<?php echo set_value('fserie') ?>" size="30" autofocus maxlength="30">
@@ -50,7 +57,7 @@
 				<label for="fleyenda2">Leyenda 2</label><br>
 				<input type="text" name="fleyenda2" id="fleyenda2" value="<?php echo set_value('fleyenda2') ?>" size="72">
 			</p>
-			
+
 			<input type="submit" name="enviar" value="Guardar" class="btn-blue corner-all f-r" style="margin-right:55px;">
 		</div>
 	</form>
@@ -59,7 +66,7 @@
 
 <!-- Bloque de alertas -->
 <?php if(isset($frm_errors)){
-	if($frm_errors['msg'] != ''){ 
+	if($frm_errors['msg'] != ''){
 ?>
 <div id="container" style="display:none">
 	<div id="withIcon">
@@ -73,8 +80,8 @@
 <script type="text/javascript" charset="UTF-8">
 $(function(){
 	create("withIcon", {
-		title: '<?php echo $frm_errors['title']; ?>', 
-		text: '<?php echo $frm_errors['msg']; ?>', 
+		title: '<?php echo $frm_errors['title']; ?>',
+		text: '<?php echo $frm_errors['msg']; ?>',
 		icon: '<?php echo base_url('application/images/alertas/'.$frm_errors['ico'].'.png'); ?>' });
 });
 </script>
