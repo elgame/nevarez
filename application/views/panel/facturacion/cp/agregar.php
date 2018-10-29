@@ -67,6 +67,12 @@
 					<label for="rfcEmisorCtaBen" class="f-l">RFC Cuenta Beneficiario (Banco)</label><br>
 					<input type="text" name="rfcEmisorCtaBen" value="<?php echo set_value('rfcEmisorCtaBen');?>" size="45" id="rfcEmisorCtaBen" class="f-l not">
 				</p>
+        <p class="f-l w100">
+          <label for="rfcEmisorCtaBen" class="f-l">Cuenta Ordenante</label><br>
+          <select id="cuentaOrdenante">
+            <option value=""></option>
+          </select>
+        </p>
 				<p class="f-l w50">
 					<label for="cuentaOrd" class="f-l">Cuenta Ordenante</label><br>
 					<input type="text" name="cuentaOrd" value="<?php echo set_value('cuentaOrd');?>" size="45" id="cuentaOrd" class="f-l not">

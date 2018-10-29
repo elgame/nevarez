@@ -87,6 +87,13 @@ $(function(){
     // });
 
     $('#submit').on('click',function(){ajax_submit_form();});
+
+    $('#cuentaOrdenante').change(function(event) {
+      var value = $(this).val(),
+      datos = value.split('^-^');
+      $('#cuentaOrd').val(datos[1]);
+      $('#rfcEmisorCtaOrd').val(datos[0]);
+    });
 });
 
 function get_seriesfrom_empresa(id_empresa){
@@ -122,6 +129,14 @@ function set_data_cliente(item, autocom){
     }else aux_isr = false;
 
     $("#dcliente").css("background-color", "#B0FFB0");
+
+    $.getJSON(base_url+'panel/clientes/ajax_get_cuentas', "id="+item.id, function(res){
+      var html = '<option value=""></option>';
+      for (var i = 0; i < res.length; i++) {
+        html += '<option value="'+res[i].banco_rfc+'^-^'+res[i].cuenta+'">'+res[i].aleas+'</option>';
+      }
+      $('#cuentaOrdenante').html(html);
+    });
 }
 
 function clean_data_cliente(){
