@@ -10,7 +10,7 @@
 		<input type="text" name="drfc" id="drfc" value="<?php echo set_value('drfc'); ?>" size="20" maxlength="13">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w40 f-l">
 		<label for="dcalle">Calle: <span class="label_frm_msg">Requerido para facturar</span></label> <br>
 		<input type="text" name="dcalle" id="dcalle" value="<?php echo set_value('dcalle'); ?>" size="30" maxlength="60">
@@ -24,7 +24,7 @@
 		<input type="text" name="dno_interior" id="dno_interior" value="<?php echo set_value('dno_interior'); ?>" size="20" maxlength="7">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="dcolonia">Colonia: <span class="label_frm_msg">Requerido para facturar</span></label> <br>
 		<input type="text" name="dcolonia" id="dcolonia" value="<?php echo set_value('dcolonia'); ?>" size="30" maxlength="60">
@@ -34,7 +34,7 @@
 		<input type="text" name="dlocalidad" id="dlocalidad" value="<?php echo set_value('dlocalidad'); ?>" size="30" maxlength="45">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="dmunicipio">Municipio / Delegación: <span class="label_frm_msg">Requerido para facturar</span></label> <br>
 		<input type="text" name="dmunicipio" id="dmunicipio" value="<?php echo set_value('dmunicipio'); ?>" size="30" maxlength="45">
@@ -44,13 +44,13 @@
 		<input type="text" name="destado" id="destado" value="<?php echo set_value('destado'); ?>" size="30" maxlength="45">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="dcp">CP: <span class="label_frm_msg">Requerido para facturar</span></label> <br>
 		<input type="text" name="dcp" id="dcp" value="<?php echo set_value('dcp'); ?>" size="20" maxlength="10">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="dtelefono">Teléfono:</label> <br>
 		<input type="text" name="dtelefono" id="dtelefono" value="<?php echo set_value('dtelefono'); ?>" size="30" maxlength="15">
@@ -60,7 +60,7 @@
 		<input type="text" name="dcelular" id="dcelular" value="<?php echo set_value('dcelular'); ?>" size="30" maxlength="20">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="demail">Email:</label> <br>
 		<input type="text" name="demail" id="demail" value="<?php echo set_value('demail'); ?>" size="30" maxlength="70">
@@ -70,7 +70,7 @@
 		<input type="text" name="dpag_web" id="dpag_web" value="<?php echo set_value('dpag_web'); ?>" size="30" maxlength="80">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="dcomentarios">Comentarios:</label> <br>
 		<textarea name="dcomentarios" id="dcomentarios" rows="3" cols="40" maxlength="400"><?php echo set_value('dcomentarios'); ?></textarea>
@@ -88,7 +88,7 @@
 		</select>
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="drecepcion_facturas">Recepción facturas:</label> <br>
 		<select name="drecepcion_facturas" id="drecepcion_facturas">
@@ -114,14 +114,14 @@
 		</select>
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50">
 		<label for="ddias_credito">Dias credito:</label> <br>
-		<input type="number" name="ddias_credito" id="ddias_credito" class="vpositive" 
+		<input type="number" name="ddias_credito" id="ddias_credito" class="vpositive"
 					value="<?php echo set_value('ddias_credito', 0); ?>" size="15" min="0" max="120"> dias
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="ddescuento">Descuento:</label> <br>
 		<input type="text" name="ddescuento" id="ddescuento" value="<?php echo set_value('ddescuento'); ?>" class="vpositive" size="30" maxlength="3"> %
@@ -145,12 +145,12 @@
 		<label for="demismos_facturacion">Los mismos de Facturación:</label> <br>
 		<input type="checkbox" name="demismos_facturacion" id="demismos_facturacion">
 	</p>
-	
+
 	<p>
 		<label for="denombre">Nombre:</label> <br>
 		<input type="text" name="denombre" id="denombre" value="<?php echo set_value('denombre'); ?>" size="40" maxlength="130">
 	</p>
-	
+
 	<p class="w40 f-l">
 		<label for="decalle">Calle:</label> <br>
 		<input type="text" name="decalle" id="decalle" value="<?php echo set_value('decalle'); ?>" size="30" maxlength="60">
@@ -164,7 +164,7 @@
 		<input type="text" name="deno_interior" id="deno_interior" value="<?php echo set_value('deno_interior'); ?>" size="20" maxlength="7">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="decolonia">Colonia:</label> <br>
 		<input type="text" name="decolonia" id="decolonia" value="<?php echo set_value('decolonia'); ?>" size="30" maxlength="60">
@@ -174,7 +174,7 @@
 		<input type="text" name="delocalidad" id="delocalidad" value="<?php echo set_value('delocalidad'); ?>" size="30" maxlength="45">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="demunicipio">Municipio / Delegación:</label> <br>
 		<input type="text" name="demunicipio" id="demunicipio" value="<?php echo set_value('demunicipio'); ?>" size="30" maxlength="45">
@@ -184,7 +184,7 @@
 		<input type="text" name="deestado" id="deestado" value="<?php echo set_value('deestado'); ?>" size="30" maxlength="45">
 	</p>
 	<div class="clear"></div>
-	
+
 	<p class="w50 f-l">
 		<label for="decp">CP:</label> <br>
 		<input type="text" name="decp" id="decp" value="<?php echo set_value('decp'); ?>" size="20" maxlength="10">
@@ -216,6 +216,31 @@
 			<td><input type="text" name="dcfax" value="<?php echo set_value('dcfax'); ?>" size="14"></td>
 		</tr>
 	</table>
+</div>
+
+<h3><a href="#">Cuentas</a></h3>
+<div>
+  <button type="button" class="btn-blue corner-all" id="addCuenta">+</button>
+  <table class="tblListados corner-all8">
+    <tr class="header btn-gray">
+      <td>Aleas</td>
+      <td>RFC Banco</td>
+      <td>Cuenta</td>
+      <td></td>
+    </tr>
+    <tbody id="datosCuenta">
+      <?php if (is_array($this->input->post('ccaleas'))): ?>
+        <?php foreach ($this->input->post('ccaleas') as $key => $value): ?>
+        <tr>
+          <td><input type="text" name="ccaleas[]" value="<?php echo $value; ?>" size="40"></td>
+          <td><input type="text" name="ccrfcbanco[]" value="<?php echo $_POST['ccrfcbanco'][$key]; ?>" size="40"></td>
+          <td><input type="text" name="cccuenta[]" value="<?php echo $_POST['cccuenta'][$key]; ?>" size="40"></td>
+          <td></td>
+        </tr>
+        <?php endforeach ?>
+      <?php endif ?>
+    </tbody>
+  </table>
 </div>
 
 <style type="text/css">
