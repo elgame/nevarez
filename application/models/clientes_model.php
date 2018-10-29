@@ -1,11 +1,11 @@
 <?php
 
 class clientes_model extends CI_Model{
-	
+
 	function __construct(){
 		parent::__construct();
 	}
-	
+
 	/**
 	 * Obtiene el listado de proveedores
 	 */
@@ -18,7 +18,7 @@ class clientes_model extends CI_Model{
 		);
 		if($params['result_page'] % $params['result_items_per_page'] == 0)
 			$params['result_page'] = ($params['result_page']/$params['result_items_per_page']);
-		
+
 		//Filtros para buscar
 		if($this->input->get('fnombre') != '')
 			$sql = " AND lower(nombre_fiscal) LIKE '%".mb_strtolower($this->input->get('fnombre'), 'UTF-8')."%'";
@@ -36,7 +36,7 @@ class clientes_model extends CI_Model{
 				ORDER BY nombre_fiscal ASC
 				", $params, true);
 		$res = $this->db->query($query['query']);
-		
+
 		$response = array(
 			'clientes' 			=> array(),
 			'total_rows' 		=> $query['total_rows'],
@@ -46,7 +46,7 @@ class clientes_model extends CI_Model{
 		$response['clientes'] = $res->result();
 		return $response;
 	}
-	
+
 	/**
 	 * Obtiene la informacion de un cliente
 	 */
@@ -61,7 +61,7 @@ class clientes_model extends CI_Model{
 			$res->free_result();
 			if($info_basic)
 				return $response;
-			
+
 			//info extra
 			$res = $this->db
 				->select('*')
@@ -72,7 +72,7 @@ class clientes_model extends CI_Model{
 				$response['info_extra'] = $res->row();
 			}
 			$res->free_result();
-			
+
 			//contactos
 			$res = $this->db
 				->select('*')
@@ -83,19 +83,31 @@ class clientes_model extends CI_Model{
 				$response['contactos'] = $res->result();
 			}
 			$res->free_result();
-			
+
+      //cuentas
+      $res = $this->db
+        ->select('*')
+        ->from('clientes_cuentas')
+        ->where("id_cliente = '".$id."'")
+      ->get();
+      $response['cuentas'] = [];
+      if($res->num_rows() > 0){
+        $response['cuentas'] = $res->result();
+      }
+      $res->free_result();
+
 			return $response;
 		}else
 			return false;
 	}
-	
+
 	/**
 	 * Agrega la informacion de una sucursal de una empresa, o la info de una empresa
 	 * sin sucursales
 	 * @param unknown_type $sucu
 	 */
 	public function addCliente($sucu=false){
-		
+
 		$id_cliente = BDUtil::getId();
 		$data = array(
 			'id_cliente' => $id_cliente,
@@ -124,7 +136,7 @@ class clientes_model extends CI_Model{
 			'retencion' => floatval($this->input->post('dretencion'))
 		);
 		$this->db->insert('clientes', $data);
-		
+
 		//Informacion Extra
 		$data = array(
 			'id_cliente' => $id_cliente,
@@ -139,15 +151,17 @@ class clientes_model extends CI_Model{
 			'cp' => $this->input->post('decp')
 		);
 		$this->db->insert('clientes_extra', $data);
-	
+
 		//Contacto
 		if(isset($_POST['dcnombre']{0})){
 			$this->addContacto($id_cliente);
 		}
+
+    $this->saveCuentas($id_cliente);
 		$msg = 3;
 		return array(true, '', $msg);
 	}
-	
+
 	/**
 	 * Modifica la informacion de una sucursal de una empresa, o la info de una empresa
 	 * sin sucursales
@@ -178,7 +192,7 @@ class clientes_model extends CI_Model{
 			'retencion' => floatval($this->input->post('dretencion'))
 		);
 		$this->db->update('clientes', $data, "id_cliente = '".$_GET['id']."'");
-	
+
 		//Informacion Extra
 		$data = array(
 			'nombre' => $this->input->post('denombre'),
@@ -193,10 +207,12 @@ class clientes_model extends CI_Model{
 		);
 		$this->db->update('clientes_extra', $data, "id_cliente = '".$_GET['id']."'");
 
+    $this->saveCuentas($_GET['id']);
+
 		return array(true, '', $msg);
 	}
-	
-	
+
+
 	/**
 	 * Elimina a un cliente, cambia su status a "e":eliminado
 	 */
@@ -204,14 +220,14 @@ class clientes_model extends CI_Model{
 		$this->db->update('clientes', array('status' => 'e'), "id_cliente = '".$_GET['id']."'");
 		return array(true, '');
 	}
-	
+
 	/**
 	 * Agrega contactos al cliente
 	 * @param unknown_type $id_sucursal
 	 */
 	public function addContacto($id_cliente=null){
 		$id_cliente = $id_cliente==null? $this->input->post('id'): $id_cliente;
-		
+
 		$id_conta = BDUtil::getId();
 		$data = array(
 			'id_contacto' => $id_conta,
@@ -236,7 +252,27 @@ class clientes_model extends CI_Model{
 		$this->db->delete('clientes_contacto', "id_contacto = '".$id_contacto."'");
 		return array(true, '');
 	}
-	
+
+  public function saveCuentas($id_cliente=null){
+    $id_cliente = $id_cliente==null? $this->input->post('id'): $id_cliente;
+
+    $this->db->delete('clientes_cuentas', "id_cliente = '{$id_cliente}'");
+    if (is_array($this->input->post('ccaleas'))) {
+      foreach ($this->input->post('ccaleas') as $key => $value) {
+        $id_cuenta = BDUtil::getId();
+        $data = array(
+          'id_cuenta'  => $id_cuenta,
+          'id_cliente' => $id_cliente,
+          'aleas'      => $_POST['ccaleas'][$key],
+          'banco_rfc'  => $_POST['ccrfcbanco'][$key],
+          'cuenta'     => $_POST['cccuenta'][$key],
+        );
+        $this->db->insert('clientes_cuentas', $data);
+      }
+    }
+    return array(true, 'Se agregó el contacto correctamente.', $id_conta);
+  }
+
 	/**
 	 * Obtiene el listado de clientes para usar ajax
 	 */
@@ -252,7 +288,7 @@ class clientes_model extends CI_Model{
 				WHERE status = 'ac' ".$sql."
 				ORDER BY nombre_fiscal ASC
 				LIMIT 20");
-	
+
 		$response = array();
 		if($res->num_rows() > 0){
 			foreach($res->result() as $itm){
@@ -264,8 +300,23 @@ class clientes_model extends CI_Model{
 				);
 			}
 		}
-	
+
 		return $response;
 	}
-	
+
+  public function getCuentasClienteAjax(){
+    $id = $this->input->get('id');
+    $res = $this->db->query("
+        SELECT id_cuenta, aleas, banco_rfc, cuenta
+        FROM clientes_cuentas
+        WHERE id_cliente = '{$id}'");
+
+    $response = array();
+    if($res->num_rows() > 0){
+      $response = $res->result();
+    }
+
+    return $response;
+  }
+
 }

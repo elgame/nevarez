@@ -7,8 +7,9 @@ class clientes extends MY_Controller {
 	 * @var unknown_type
 	 */
 	private $excepcion_privilegio = array('clientes/ajax_frmAddGrupo/', 'clientes/ajax_frmAddSucu/',
-			'productos/ajax_productos_tbl/', 'productos/ajax_productos_addmod/','clientes/ajax_get_clientes/');
-	
+			'productos/ajax_productos_tbl/', 'productos/ajax_productos_addmod/','clientes/ajax_get_clientes/',
+      'clientes/ajax_get_cuentas/');
+
 	public function _remap($method){
 		$this->carabiner->css(array(
 				array('libs/jquery-ui.css', 'screen'),
@@ -23,7 +24,7 @@ class clientes extends MY_Controller {
 				array('libs/jquery.treeview.js'),
 				array('general/alertas.js')
 		));
-		
+
 		$this->load->model("empleados_model");
 		if($this->empleados_model->checkSession()){
 			$this->empleados_model->excepcion_privilegio = $this->excepcion_privilegio;
@@ -35,7 +36,7 @@ class clientes extends MY_Controller {
 		}else
 			redirect(base_url('panel/home'));
 	}
-	
+
 	/**
 	 * Default. Mustra el listado de proveedores para administrarlos
 	 */
@@ -51,30 +52,30 @@ class clientes extends MY_Controller {
 		));
 		$this->load->model('clientes_model');
 		$this->load->library('pagination');
-		
+
 		$params['info_empleado'] = $this->info_empleado['info']; //info empleado
 		$params['opcmenu_active'] = 'Clientes'; //activa la opcion del menu
 		$params['seo'] = array(
 			'titulo' => 'Administrar Clientes'
 		);
-		
+
 		$params['clientes'] = $this->clientes_model->getClientes();
-		
+
 // 		echo '<pre>';
 // 		var_dump($params['clientes']['clientes']);
 // 		echo count($params['clientes']['clientes']);
 // 		echo '</pre>';
 // 		exit;
-		
+
 		if(isset($_GET['msg']{0}))
 			$params['frm_errors'] = $this->showMsgs($_GET['msg']);
-		
+
 		$this->load->view('panel/header', $params);
 		$this->load->view('panel/general/menu', $params);
 		$this->load->view('panel/clientes/listado', $params);
 		$this->load->view('panel/footer');
 	}
-	
+
 	/**
 	 * Agrega un cliente a la bd
 	 */
@@ -87,38 +88,38 @@ class clientes extends MY_Controller {
 			array('libs/jquery.numeric.js'),
 			array('clientes/frm_addmod.js')
 		));
-		
+
 		$params['info_empleado'] = $this->info_empleado['info']; //info empleado
 		$params['seo'] = array(
 			'titulo' => 'Agregar Cliente'
 		);
 		$params['opcmenu_active'] = 'Clientes'; //activa la opcion del menu
-		
+
 		$this->configAddModEmpl();
 		$this->load->model('listas_precio_model');
-		
+
 		if($this->form_validation->run() == FALSE){
 			$params['frm_errors'] = $this->showMsgs(2, preg_replace("[\n|\r|\n\r]", '', validation_errors()));
 		}else{
 			$this->load->model('clientes_model');
 				$respons = $this->clientes_model->addCliente();
-			
+
 			if($respons[0])
 				redirect(base_url('panel/clientes/agregar/?'.String::getVarsLink(array('msg')).'&msg='.$respons[2]));
 		}
-		
+
 		$params['listas'] = $this->listas_precio_model->obtenListasPrecio();
-		
+
 		if(isset($_GET['msg']{0}))
 			$params['frm_errors'] = $this->showMsgs($_GET['msg']);
-		
+
 		$this->load->view('panel/header', $params);
 		$this->load->view('panel/general/menu', $params);
 		$params['html_form'] = $this->load->view('panel/clientes/frmAgregarSucu', $params, true);
 		$this->load->view('panel/clientes/agregar', $params);
 		$this->load->view('panel/footer');
 	}
-	
+
 	/**
 	 * Modificar una sucursal a un cliente a la bd
 	 */
@@ -134,43 +135,43 @@ class clientes extends MY_Controller {
 				array('libs/jquery.numeric.js'),
 				array('clientes/frm_addmod.js')
 		));
-	
+
 		$params['info_empleado'] = $this->info_empleado['info']; //info empleado
 		$params['seo'] = array(
 				'titulo' => 'Modificar Cliente'
 		);
 		$params['opcmenu_active'] = 'Clientes'; //activa la opcion del menu
-	
+
 		if(isset($_GET['id']{
 			0})){
 				$this->configAddModEmpl();
 				$this->load->model('listas_precio_model');
 				$this->load->model('clientes_model');
-	
+
 				if($this->form_validation->run() == FALSE){
 					$params['frm_errors'] = $this->showMsgs(2, preg_replace("[\n|\r|\n\r]", '', validation_errors()));
 				}else{
 					$respons = $this->clientes_model->updateCliente();
-						
+
 					if($respons[0])
 						redirect(base_url('panel/clientes/modificar/?'.String::getVarsLink(array('msg')).'&msg='.$respons[2]));
 				}
-	
+
 				$params['listas'] = $this->listas_precio_model->obtenListasPrecio();
 				$params['info'] = $this->clientes_model->getInfoCliente($_GET['id']);
 			}else
 				$params['frm_errors'] = $this->showMsgs(1);
-	
+
 			if(isset($_GET['msg']{
 				0}))
 					$params['frm_errors'] = $this->showMsgs($_GET['msg']);
-	
+
 				$this->load->view('panel/header', $params);
 				$this->load->view('panel/general/menu', $params);
 				$this->load->view('panel/clientes/modificar_sucursal', $params);
 				$this->load->view('panel/footer');
 	}
-	
+
 	/**
 	 * Elimina a un cliente, cambia el status a "e":eliminado
 	 */
@@ -183,7 +184,7 @@ class clientes extends MY_Controller {
 		}else
 			$params['frm_errors'] = $this->showMsgs(1);
 	}
-	
+
 	/*********** CONTACTOS **************/
 	/**
 	 * Agrega un nuevo contacto a un cliente (sucursal) utilizando Ajax
@@ -217,7 +218,7 @@ class clientes extends MY_Controller {
 						'label'		=> 'Contacto Fax',
 						'rules'		=> 'max_length[15]');
 				$this->form_validation->set_rules($rules);
-					
+
 				if($this->form_validation->run() == FALSE){
 					$params['msg'] = $this->showMsgs(2, preg_replace("[\n|\r|\n\r]", '', validation_errors()));
 				}else{
@@ -235,10 +236,10 @@ class clientes extends MY_Controller {
 				}
 			}else
 				$params['msg'] = $this->showMsgs(1);
-	
+
 			echo json_encode($params);
 	}
-	
+
 	/**
 	 * Elimina un contacto del un cliente utilizando Ajax
 	 */
@@ -251,27 +252,34 @@ class clientes extends MY_Controller {
 					$params['msg'] = $this->showMsgs(7);
 			}else
 				$params['msg'] = $this->showMsgs(1);
-	
+
 			echo json_encode($params);
 	}
-	
+
 	/**
 	 * Obtiene lostado de clientes para el autocomplete, ajax
 	 */
 	public function ajax_get_clientes(){
 		$this->load->model('clientes_model');
 		$params = $this->clientes_model->getClientesAjax();
-	
+
 		echo json_encode($params);
-	}	
-	
+	}
+
+  public function ajax_get_cuentas(){
+    $this->load->model('clientes_model');
+    $params = $this->clientes_model->getCuentasClienteAjax();
+
+    echo json_encode($params);
+  }
+
 	/**
 	 * Configura los metodos de agregar y modificar
 	 */
 	private function configAddModEmpl(){
 		$this->load->library('form_validation');
 		$contacto = false;
-		
+
 			$rules = array(
 				array('field'	=> 'dlista_precio',
 						'label'	=> 'Lista de precio',
@@ -336,7 +344,7 @@ class clientes extends MY_Controller {
 				array('field'	=> 'dretencion',
 						'label'	=> 'Retención',
 						'rules'	=> 'numeric|max_length[5]'),
-				
+
 				array('field'	=> 'denombre',
 						'label'	=> 'Nombre',
 						'rules'	=> 'max_length[130]'),
@@ -366,13 +374,13 @@ class clientes extends MY_Controller {
 						'rules'	=> 'max_length[10]'),
 			);
 			$contacto = true;
-		
+
 		if($contacto){
 			//Contacto
 			$condi_rul = '';
 			if(isset($_POST['dcnombre']{0}))
 				$condi_rul = 'required|';
-				
+
 			$rules[] = array('field'	=> 'dcnombre',
 					'label'		=> 'Contacto Nombre',
 					'rules'		=> $condi_rul.'max_length[120]');
@@ -398,10 +406,22 @@ class clientes extends MY_Controller {
 					'label'		=> 'Contacto Fax',
 					'rules'		=> 'max_length[15]');
 		}
+
+    if(!empty($_POST['ccaleas'])){
+      $rules[] = array('field'  => 'ccaleas[]',
+          'label'   => 'Aleas',
+          'rules'   => 'required|max_length[120]');
+      $rules[] = array('field'  => 'ccrfcbanco[]',
+          'label'   => 'RFC Banco',
+          'rules'   => 'required|max_length[15]');
+      $rules[] = array('field'  => 'cccuenta[]',
+          'label'   => 'Cuenta',
+          'rules'   => 'required|max_length[20]');
+    }
 		$this->form_validation->set_rules($rules);
 	}
-	
-	
+
+
 	/**
 	 * Muestra mensajes cuando se realiza alguna accion
 	 * @param unknown_type $tipo
@@ -439,7 +459,7 @@ class clientes extends MY_Controller {
 				$icono = 'ok';
 			break;
 		}
-		
+
 		return array(
 			'title' => $title,
 			'msg' => $txt,
