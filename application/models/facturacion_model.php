@@ -2282,6 +2282,9 @@ class facturacion_model extends privilegios_model{
           $pdf->Row(array($cuentas), false, false, null, 2, 1);
 
           $pdf->Line(0, $pdf->GetY(), 216, $pdf->GetY());
+
+          if($pdf->GetY() + 10 >= $pdf->limiteY) //salta de pagina si exede el max
+            $pdf->AddPage();
         }
       }
 
@@ -2312,6 +2315,9 @@ class facturacion_model extends privilegios_model{
         foreach ($factura['cfdi_ext']->cfdiRelacionados->cfdiRelacionado as $key => $value) {
           $pdf->SetXY(0, $pdf->GetY());
           $pdf->Row(array("UUID: {$value->uuid}"), false, true, null, 2, 1);
+
+          if($pdf->GetY() + 10 >= $pdf->limiteY) //salta de pagina si exede el max
+            $pdf->AddPage();
         }
       }
 
