@@ -669,9 +669,9 @@ class cfdi{
       'doctoRelacionado'  => []
     ];
     foreach ($data['facturas'] as $key => $pago) {
-      $cfdiRel['cfdiRelacionado'][] = array(
-        'uuid' => $pago['uuid'],
-      );
+      // $cfdiRel['cfdiRelacionado'][] = array(
+      //   'uuid' => $pago['uuid'],
+      // );
 
       // $saldo_factura = $CI->cuentas_cobrar_model->getDetalleVentaFacturaData($pago->id_factura, 'f', true, true);
       // $saldo_factura['saldo'] = floor($saldo_factura['saldo']*100)/100;
@@ -778,9 +778,9 @@ class cfdi{
       ],
       'pagos' => [$comPago]
     );
-    if ($cfdiRel) {
-      $datosApi['cfdiRelacionados'] = $cfdiRel;
-    }
+    // if ($cfdiRel) {
+    //   $datosApi['cfdiRelacionados'] = $cfdiRel;
+    // }
 
     return $datosApi;
   }
