@@ -1,5 +1,41 @@
 
  ✔ Complemento de pago @done (18-10-06 13:51)
+    CREATE OR REPLACE VIEW public.get_facturas_cp AS
+         SELECT f.id_factura,
+            f.id_cliente,
+            c.nombre_fiscal AS cliente,
+            f.uuid,
+            f.serie,
+            f.folio,
+            f.total,
+            count(fc.id_compago) + 1 AS parcialidad,
+            COALESCE(sum(fc.abono), 0::double precision) AS pagos,
+            f.total - COALESCE(sum(fc.abono), 0::double precision) AS saldo
+           FROM facturacion f
+             JOIN clientes c ON c.id_cliente::text = f.id_cliente::text
+             LEFT JOIN (
+          SELECT fcc.*
+          FROM facturacion ff
+               JOIN facturacion_compago fcc ON ff.id_factura::text = fcc.id_compago::text
+          WHERE ff.status <> 'ca'
+             ) fc ON f.id_factura::text = fc.id_factura::text
+          WHERE f.status::text <> 'ca'::text AND f.uuid IS NOT NULL AND f.tipo_comprobante::text = 'ingreso'::text
+          GROUP BY f.id_factura, c.id_cliente
+         HAVING (f.total - COALESCE(sum(fc.abono), 0::double precision)) > 0::double precision
+          ORDER BY f.folio DESC;
+        ALTER TABLE public.get_facturas_cp OWNER TO programa; COMMENT ON VIEW public.get_facturas_cp IS 'facturas de para complemento de pago';
+    CREATE TABLE public.clientes_cuentas
+        (
+          id_cuenta character varying(25) NOT NULL,
+          id_cliente character varying(25) NOT NULL,
+          aleas character varying(120),
+          banco_rfc character varying(15),
+          cuenta character varying(20),
+          CONSTRAINT clientes_cuentas_pkey PRIMARY KEY (id_cuenta),
+          CONSTRAINT clientes_cuentas_id_cliente_fkey FOREIGN KEY (id_cliente)
+              REFERENCES public.clientes (id_cliente) MATCH SIMPLE
+              ON UPDATE CASCADE ON DELETE CASCADE
+        ) WITH ( OIDS=FALSE ); ALTER TABLE public.clientes_cuentas OWNER TO programa;
     INSERT INTO public.privilegios(id_privilegio, nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('1l4fba64a9b6bd36.19107194', 'Complementos de pago','l4fba64a9b6bd36.19107194',TRUE,'facturacion/lista_cp/','facturacion.png',FALSE);
     INSERT INTO public.privilegios(id_privilegio, nombre, id_padre, mostrar_menu, url_accion, url_icono, target_blank) VALUES ('2l4fba64a9b6bd36.19107194', 'Agregar','l5bb7b7834f8a40.34557076',TRUE,'facturacion/agregar_cp/','add.png',FALSE);
     ALTER TABLE public.facturacion_series_folios ADD COLUMN tipo character varying(10) NOT NULL DEFAULT 'f'::character varying;

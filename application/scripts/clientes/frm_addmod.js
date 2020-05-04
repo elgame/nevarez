@@ -1,6 +1,6 @@
 $(function(){
 	asignaAccordion();
-	
+
 	//Cambia el formulario si tiene o no sucursales
 	$("#dtiene_sucur").on('change', function(){
 		var method = ($(this).is(":checked")? "clientes/ajax_frmAddGrupo/": "clientes/ajax_frmAddSucu/");
@@ -9,12 +9,14 @@ $(function(){
 			$("#frmsec-acordion").accordion("destroy");
 			$("#frmsec-acordion").html(resp);
 			asignaAccordion();
-		}).complete(function(){ 
-	    	loader.close(); 
+		}).complete(function(){
+	    	loader.close();
 	    });
 	});
-	
+
 	$(document).on('change', "#demismos_facturacion", mismosDatosFacturacion);
+
+  addCuentas();
 });
 
 function mismosDatosFacturacion(){
@@ -88,27 +90,27 @@ function agregarContacto(id_tr, obj){
 	$("#"+id_tr+" input").each(function(){
 		data += this.name+"="+this.value+"&";
 	});
-	
+
 	loader.create();
 	$.post(obj.href, data, function(resp){
 		create("withIcon", {
-			title: resp.msg.title, 
-			text: resp.msg.msg, 
+			title: resp.msg.title,
+			text: resp.msg.msg,
 			icon: base_url+'application/images/alertas/'+resp.msg.ico+'.png' });
 		if(resp.msg.ico == 'ok'){
 			//si es OK se elimina el row form
 			$("#"+id_tr).remove();
 			contador_contacto = 0;
 		}
-		
+
 		if(resp.info){
 			//comprueba si tiene el permiso de eliminar contacto
 			var priv_eliminar_contacto = '';
 			if($("#priv_eliminar_contacto").length > 0)
-				priv_eliminar_contacto = '<a href="'+base_url+'panel/clientes/eliminar_contacto/?id='+resp.info.id_contacto+'" class="linksm"'+ 
+				priv_eliminar_contacto = '<a href="'+base_url+'panel/clientes/eliminar_contacto/?id='+resp.info.id_contacto+'" class="linksm"'+
 					'onclick="msb.confirm(\'Estas seguro de eliminar el contacto?\', this, eliminaContacto); return false;">'+
 					'<img src="'+base_url+'application/images/privilegios/delete.png" width="10" height="10"> Eliminar contacto</a>';
-			
+
 			//Agrego el tr con la informacion del contacto agregado
 			$("#tbl_contactos tr.header:last").after(
 			'<tr>'+
@@ -130,8 +132,8 @@ function agregarContacto(id_tr, obj){
 			'	</td>'+
 			'</tr>');
 		}
-	}, "json").complete(function(){ 
-    	loader.close(); 
+	}, "json").complete(function(){
+    	loader.close();
     });
 }
 
@@ -139,15 +141,32 @@ function eliminaContacto(obj){
 	loader.create();
 	$.post(obj.href, "", function(resp){
 		create("withIcon", {
-			title: resp.msg.title, 
-			text: resp.msg.msg, 
+			title: resp.msg.title,
+			text: resp.msg.msg,
 			icon: base_url+'application/images/alertas/'+resp.msg.ico+'.png' });
 		if(resp.msg.ico == 'ok'){
 			//si es OK se elimina el row form
 			$(obj).parents("tr").remove();
 		}
-	}, "json").complete(function(){ 
-    	loader.close(); 
+	}, "json").complete(function(){
+    	loader.close();
     });
 }
 
+
+function addCuentas(){
+  $("#addCuenta").click(function() {
+    $('#datosCuenta').append(
+      '<tr>'+
+      ' <td><input type="text" name="ccaleas[]" value="" size="40"></td>'+
+      ' <td><input type="text" name="ccrfcbanco[]" value="" size="40"></td>'+
+      ' <td><input type="text" name="cccuenta[]" value="" size="40"></td>'+
+      ' <td><img src="'+base_url+'application/images/privilegios/delete.png" class="removeCuenta" width="10" height="10" style="cursor: pointer"></td>'+
+      '</tr>');
+  });
+
+  $('#datosCuenta .removeCuenta').live('click', function(event) {
+    var $tr = $(this).parent().parent();
+    $tr.remove();
+  });
+}
