@@ -858,7 +858,7 @@ class facturacion_model extends privilegios_model{
 
       if(isset($result->data->status_uuid)){
         $status_uuid = $result->data->status_uuid;
-        if ($result->data->status_uuid === '201' || $result->data->status_uuid === '202')
+        if ($result->data->status_uuid == '201' || $result->data->status_uuid == '202')
         {
           $this->db->update('facturacion',
           array('status' => 'ca', 'status_timbrado' => 'ca'),
