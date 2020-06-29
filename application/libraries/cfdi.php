@@ -677,8 +677,8 @@ class cfdi{
       // $saldo_factura['saldo'] = floor($saldo_factura['saldo']*100)/100;
       // $saldoAnt = ($saldo_factura['saldo']+$pago->pago_factura);
       $metodoDePago = 'PPD';
-      if ($pago['total'] == $pago['abono'])
-        $metodoDePago = 'PUE';
+      // if ($pago['total'] == $pago['abono'])
+      //   $metodoDePago = 'PUE';
       $folio = explode('-', $pago['folio']);
       $comPago['doctoRelacionado'][] = array(
         "idDocumento"    => $pago['uuid'],
